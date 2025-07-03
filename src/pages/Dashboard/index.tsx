@@ -5,6 +5,7 @@ import { RetentionMonthCard } from "@/components/Cards/RetentionMonthCard";
 import { CancelationInPeriod } from "@/components/Graphics/CancelationInPeriod";
 import { RetentionByMonth } from "@/components/Graphics/RetentionByMonth";
 
+
 export function Dashboard() {
   return (
     <main className="flex flex-col m-10 h-full">
@@ -15,9 +16,9 @@ export function Dashboard() {
         <RetentionMonthCard />
       </div>
 
-      <div className="w-full h-[500px] flex justify-center flex-col md:flex-row gap-6 mt-16">
+      <div className="w-full h-[calc(100vh-350px)] space-x-4 flex justify-center flex-col md:flex-row mt-10">
         <CancelationInPeriod />
-        <RetentionByMonth />
+       <RetentionByMonth/>
       </div>
     </main>
   );

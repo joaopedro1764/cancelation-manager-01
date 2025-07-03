@@ -11,18 +11,21 @@ export function DefaultLayout() {
   }
 
   return (
-    <div className="flex h-screen bg-cover object-contain overflow-hidden">
+    <div className="flex h-screen overflow-hidden relative">
       <Sidebar
         handleOpenAndCloseSidebar={handleOpenAndCloseSidebar}
         isOpenSidebar={isOpenSidebar}
       />
 
-      <div className="flex-1 transition-all duration-200 flex-col bg-gray-100">
-        <Header
-          handleOpenAndCloseSidebar={handleOpenAndCloseSidebar}
-          title="Dashboard"
-        />
-        <Outlet />
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          isOpenSidebar ? "ml-64" : "ml-0"
+        }`}
+      >
+        <Header handleOpenAndCloseSidebar={handleOpenAndCloseSidebar} />
+        <div className="flex-1 bg-gray-100 p-4">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

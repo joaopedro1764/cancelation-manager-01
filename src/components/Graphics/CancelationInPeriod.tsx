@@ -2,11 +2,9 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis,
 } from "recharts";
 import { DateRangePicker } from "../ui/date-range-picker";
 import { Label } from "../ui/label";
@@ -21,45 +19,39 @@ export function CancelationInPeriod() {
     to: new Date(),
   });
 
-  const COLORS = ["#1E3A8A", "#3B82F6", "#60A5FA", "#94A3B8", "#CBD5E1"];
 
   return (
     <div className="flex-1 h-full border p-4 rounded-lg shadow">
-      <div className="flex justify-between items-center font-bold gap-3 mb-5">
-        <h1 className="text-xl text-blue-400">Cancelamentos no período</h1>
+      <div className="flex justify-between items-center font-bold gap-3">
+        <h1 className="text-xl text-blue-600">Cancelamentos no período</h1>
         <div className="flex justify-end gap-3">
           <Label className="font-bold text-blue-400">Período</Label>
           <DateRangePicker date={dateRange} OnDateChange={setDateRange} />
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height="90%">
-        <BarChart data={motivosCancelamento}>
+      <ResponsiveContainer width="100%">
+        <BarChart
+          data={motivosCancelamento}
+          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+        >
           <CartesianGrid strokeDasharray="2 2" />
-          <XAxis fontSize={12} fontWeight="bold" dataKey="motivo" />
-          <YAxis />
+          <XAxis
+            className="text-[10px] font-bold"
+            dataKey="motivo"
+            angle={-45}
+            textAnchor="end"
+            interval={0}
+            height={100}
+            tickFormatter={(value) =>
+              value.length > 15 ? value.slice(0, 15) + "..." : value
+            }
+          />
+
           <Tooltip />
-          <Bar dataKey="quantidade" fill={COLORS[0]} barSize={60}>
-            {motivosCancelamento.map((_, index) => (
-              <Cell key={`bar-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Bar>
+          <Bar dataKey="quantidade" fill="#60A5FA" />
         </BarChart>
       </ResponsiveContainer>
-
-      <div className="w-full mt-4 flex justify-between flex-wrap gap-4">
-        {motivosCancelamento.map((item, index) => (
-          <div key={item.id} className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded"
-              style={{ backgroundColor: COLORS[index % COLORS.length] }}
-            ></div>
-            <span className="text-sm font-bold text-gray-700">
-              {item.motivo}
-            </span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

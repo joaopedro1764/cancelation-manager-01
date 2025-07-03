@@ -1,0 +1,183 @@
+[
+  {
+    "nomeCliente": "Bruna Ferreira",
+    "nomeColaborador": "Lucas Andrade",
+    "quantidade": 3,
+    "setor": "Marketing",
+    "motivoRetencao": "Acesso antecipado a promoções",
+    "dataRetencao": "2025-06-16",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Diego Martins",
+    "nomeColaborador": "Camila Costa",
+    "quantidade": 2,
+    "setor": "Financeiro",
+    "motivoRetencao": "Condições de parcelamento flexíveis",
+    "dataRetencao": "2025-06-17",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Aline Souza",
+    "nomeColaborador": "Henrique Duarte",
+    "quantidade": 1,
+    "setor": "Suporte",
+    "motivoRetencao": "Atendimento ágil",
+    "dataRetencao": "2025-06-18",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Rafael Costa",
+    "nomeColaborador": "Juliana Neves",
+    "quantidade": 4,
+    "setor": "Comercial",
+    "motivoRetencao": "Plano empresarial",
+    "dataRetencao": "2025-06-19",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Sofia Lima",
+    "nomeColaborador": "Anderson Melo",
+    "quantidade": 2,
+    "setor": "Financeiro",
+    "motivoRetencao": "Descontos progressivos",
+    "dataRetencao": "2025-06-20",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Murilo Pires",
+    "nomeColaborador": "Bianca Ribeiro",
+    "quantidade": 1,
+    "setor": "Marketing",
+    "motivoRetencao": "Campanha de recompensas",
+    "dataRetencao": "2025-06-21",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Isabela Duarte",
+    "nomeColaborador": "Rodrigo Torres",
+    "quantidade": 5,
+    "setor": "Suporte",
+    "motivoRetencao": "Revisão técnica agendada",
+    "dataRetencao": "2025-06-22",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Thiago Almeida",
+    "nomeColaborador": "Vanessa Rocha",
+    "quantidade": 3,
+    "setor": "Comercial",
+    "motivoRetencao": "Pacote de serviços adicional",
+    "dataRetencao": "2025-06-23",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Camila Nogueira",
+    "nomeColaborador": "Bruno Reis",
+    "quantidade": 2,
+    "setor": "Financeiro",
+    "motivoRetencao": "Negociação direta com gerente",
+    "dataRetencao": "2025-06-24",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Daniel Teixeira",
+    "nomeColaborador": "Alana Monteiro",
+    "quantidade": 1,
+    "setor": "Marketing",
+    "motivoRetencao": "Conteúdo exclusivo",
+    "dataRetencao": "2025-06-25",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Lívia Barbosa",
+    "nomeColaborador": "Eduardo Cunha",
+    "quantidade": 4,
+    "setor": "Suporte",
+    "motivoRetencao": "Plano de manutenção gratuito",
+    "dataRetencao": "2025-06-26",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "João Victor",
+    "nomeColaborador": "Tatiane Oliveira",
+    "quantidade": 2,
+    "setor": "Comercial",
+    "motivoRetencao": "Oferta personalizada",
+    "dataRetencao": "2025-06-27",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Nathalia Campos",
+    "nomeColaborador": "Felipe Costa",
+    "quantidade": 3,
+    "setor": "Financeiro",
+    "motivoRetencao": "Crédito aprovado",
+    "dataRetencao": "2025-06-28",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Vinícius Moura",
+    "nomeColaborador": "Isadora Ribeiro",
+    "quantidade": 1,
+    "setor": "Marketing",
+    "motivoRetencao": "Clube de vantagens",
+    "dataRetencao": "2025-06-29",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Carolina Leite",
+    "nomeColaborador": "Gabriel Soares",
+    "quantidade": 2,
+    "setor": "Suporte",
+    "motivoRetencao": "Revisão completa do sistema",
+    "dataRetencao": "2025-06-30",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Marcos Silva",
+    "nomeColaborador": "Patrícia Lima",
+    "quantidade": 3,
+    "setor": "Comercial",
+    "motivoRetencao": "Ativação de bônus",
+    "dataRetencao": "2025-07-01",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Larissa Lopes",
+    "nomeColaborador": "Renan Dias",
+    "quantidade": 4,
+    "setor": "Financeiro",
+    "motivoRetencao": "Acordo de renegociação",
+    "dataRetencao": "2025-07-02",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Igor Neves",
+    "nomeColaborador": "Fernanda Souza",
+    "quantidade": 1,
+    "setor": "Marketing",
+    "motivoRetencao": "Ofertas segmentadas",
+    "dataRetencao": "2025-07-03",
+    "status": "pendente"
+  },
+  {
+    "nomeCliente": "Tatiane Castro",
+    "nomeColaborador": "Leonardo Martins",
+    "quantidade": 5,
+    "setor": "Suporte",
+    "motivoRetencao": "Visita técnica agendada",
+    "dataRetencao": "2025-07-04",
+    "status": "concluido"
+  },
+  {
+    "nomeCliente": "Felipe Ribeiro",
+    "nomeColaborador": "Cíntia Melo",
+    "quantidade": 2,
+    "setor": "Comercial",
+    "motivoRetencao": "Consultoria gratuita",
+    "dataRetencao": "2025-07-05",
+    "status": "pendente"
+  }
+
+]

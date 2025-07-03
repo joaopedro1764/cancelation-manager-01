@@ -2,14 +2,14 @@ import { Route, Routes } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { DefaultLayout } from "./pages/DefaultLayout";
-import { Clientes } from "./pages/Clientes";
-import { Solicitacoes } from "./pages/Solicitacoes";
+import { Cancelamentos } from "./pages/Cancelamentos";
+import { Retencoes } from "./pages/Retenções";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const routes = [
-  { path: "/clientes", element: <Clientes /> },
+  { path: "/cancelamentos", element: <Cancelamentos /> },
   { path: "/dashboard", element: <Dashboard /> },
-  { path: "/solicitacoes", element: <Solicitacoes /> },
+  { path: "/retencoes", element: <Retencoes /> },
 ];
 
 export function Router() {

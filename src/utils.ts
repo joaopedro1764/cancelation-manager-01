@@ -1,6 +1,8 @@
+import { z } from "zod";
+
 export const motivosCancelamento = [
   {
-    id: 1,
+    id: "1",
     motivo: "Corte de gastos",
     quantidade: 3,
     porcentagem: 28,
@@ -8,7 +10,7 @@ export const motivosCancelamento = [
     mes: "Junho/2025",
   },
   {
-    id: 2,
+    id: "2",
     motivo: "Problemas financeiros",
     quantidade: 8,
     porcentagem: 22,
@@ -16,7 +18,7 @@ export const motivosCancelamento = [
     mes: "Junho/2025",
   },
   {
-    id: 3,
+    id: "3",
     motivo: "Insatisfação",
     quantidade: 24,
     porcentagem: 16,
@@ -24,7 +26,7 @@ export const motivosCancelamento = [
     mes: "Junho/2025",
   },
   {
-    id: 4,
+    id: "4",
     motivo: "Local sem viabilidade",
     quantidade: 4,
     porcentagem: 12,
@@ -32,11 +34,147 @@ export const motivosCancelamento = [
     mes: "Junho/2025",
   },
   {
-    id: 5,
+    id: "5",
     motivo: "Trocou de provedor",
     quantidade: 30,
     porcentagem: 10,
     setor: "Cobrança",
+    mes: "Junho/2025",
+  },
+  {
+    id: "6",
+    motivo: "Mudança de Endereço (Inviabilidade Técnica)",
+    quantidade: 2,
+    porcentagem: 4,
+    setor: "Comercial",
+    mes: "Junho/2025",
+  },
+  {
+    id: "7",
+    motivo: "Pessoal não Detalhado",
+    quantidade: 1,
+    porcentagem: 2,
+    setor: "Cancelamento",
+    mes: "Junho/2025",
+  },
+  {
+    id: "8",
+    motivo: "Falecimento do Titular",
+    quantidade: 1,
+    porcentagem: 1,
+    setor: "Cancelamento",
+    mes: "Junho/2025",
+  },
+  {
+    id: "9",
+    motivo: "Solicitação de agendamento não atendida",
+    quantidade: 2,
+    porcentagem: 2,
+    setor: "Suporte",
+    mes: "Junho/2025",
+  },
+  {
+    id: "10",
+    motivo: "Mudança para local que já possui Nmultifibra",
+    quantidade: 1,
+    porcentagem: 1,
+    setor: "Comercial",
+    mes: "Junho/2025",
+  },
+  {
+    id: "11",
+    motivo: "Empresa fechou",
+    quantidade: 1,
+    porcentagem: 1,
+    setor: "Cancelamento",
+    mes: "Junho/2025",
+  },
+  {
+    id: "12",
+    motivo: "Insatisfação com serviço prestado",
+    quantidade: 5,
+    porcentagem: 4,
+    setor: "Suporte",
+    mes: "Junho/2025",
+  },
+  {
+    id: "13",
+    motivo: "Insatisfação com valor do serviço",
+    quantidade: 4,
+    porcentagem: 3,
+    setor: "Financeiro",
+    mes: "Junho/2025",
+  },
+  {
+    id: "14",
+    motivo: "Insatisfação com atendimento",
+    quantidade: 3,
+    porcentagem: 2,
+    setor: "Atendimento",
+    mes: "Junho/2025",
+  },
+  {
+    id: "15",
+    motivo: "Trocou de provedor (Pacote dados móveis incluso)",
+    quantidade: 2,
+    porcentagem: 2,
+    setor: "Comercial",
+    mes: "Junho/2025",
+  },
+  {
+    id: "16",
+    motivo: "Trocou de provedor (Pacote de TV incluso)",
+    quantidade: 1,
+    porcentagem: 1,
+    setor: "Comercial",
+    mes: "Junho/2025",
+  },
+  {
+    id: "17",
+    motivo: "Término de contrato",
+    quantidade: 2,
+    porcentagem: 2,
+    setor: "Financeiro",
+    mes: "Junho/2025",
+  },
+  {
+    id: "18",
+    motivo: "Trocou de Provedor (Melhor Proposta Financeira)",
+    quantidade: 6,
+    porcentagem: 5,
+    setor: "Comercial",
+    mes: "Junho/2025",
+  },
+  {
+    id: "19",
+    motivo: "Pausa no Contrato",
+    quantidade: 2,
+    porcentagem: 2,
+    setor: "Financeiro",
+    mes: "Junho/2025",
+  },
+  {
+    id: "20",
+    motivo: "Fraude na contratação",
+    quantidade: 1,
+    porcentagem: 1,
+    setor: "Segurança",
+    mes: "Junho/2025",
+  },
+  {
+    id: 21,
+    motivo: "Direito do Consumidor 7 dias",
+    quantidade: 2,
+    porcentagem: 2,
+    setor: "Comercial",
+    mes: "Junho/2025",
+  },
+  {
+    id: 22,
+    motivo: "Insatisfação com Streaming",
+    quantidade: 3,
+    porcentagem: 2,
+    setor: "Streaming",
     mes: "Junho/2025",
   },
 ];
@@ -53,7 +191,6 @@ export interface PieChartPayload {
     porcentagem: number;
     quantidades: number;
     setor: string;
-    [key: string]: any;
   };
   type?: string;
   className?: string;
@@ -159,3 +296,82 @@ export const pieData: RetentionProps[] = [
     ],
   },
 ];
+
+export const newSearchRetention = z.object({
+  userId: z.string().optional(),
+  clientName: z.string().optional(),
+  reason: z.string().optional(),
+  dateRange: z
+    .object({
+      from: z.date().optional(),
+      to: z.date().optional(),
+    })
+    .optional(),
+});
+
+export const months = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+export const setores = [
+  "Cancelamento",
+  "Suporte",
+  "Comercial",
+  "Financeiro",
+  "Cobrança",
+];
+
+export const motivosCancelamentos = [
+  "Mudanca de Endereco (Inviabilidade Tecnica)",
+  "Corte de gastos",
+  "Pessoal nao Detalhado",
+  "Falecimento do Titular",
+  "Solicitacao de agendamento nao atendida",
+  "Mudanca para local que ja possui Nmultifibra",
+  "Empresa fechou",
+  "Insatisfacao com servico prestado",
+  "Insatisfacao com valor do servico",
+  "Insatisfacao com atendimento",
+  "Trocou de provedor (Pacote dados moveis incluso)",
+  "Trocou de provedor (Pacote de TV incluso)",
+  "Termino de contrato",
+  "Trocou de Provedor (Melhor Proposta Financeira)",
+  "Pausa no Contrato",
+  "Fraude na contratação",
+  "Direito do Consumidor 7 dias",
+  "Insatisfação com Streaming",
+];
+
+export type CancelamentoItem = {
+  idCliente?: string | number;
+  nome?: string;
+  idContrato?: string | number;
+  idAtendimento?: string | number;
+  tempoAtivo?: string;
+  bairro?: string;
+  motivoReal?: string;
+  [key: string]: any;
+};
+
+export type RetencoesItem = {
+  idCliente?: string | number;
+  nome?: string;
+  idContrato?: string | number;
+  idAtendimento?: string | number;
+  motivoCancelamento:string;
+  retencaoAplicada:string;
+  responsavel:stromg
+  [key: string]: any;
+};
+
