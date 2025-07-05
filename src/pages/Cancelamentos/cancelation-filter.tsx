@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { motivosCancelamentos, type newSearchRetention } from "@/utils";
+import { bairrosCotia, motivosCancelamentos, type newSearchRetention } from "@/utils";
 import { Filter, Search, X } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -21,7 +21,7 @@ type NewSearchRetentionType = z.infer<typeof newSearchRetention>;
 
 export function CancelationFilter() {
   const [searchParams, setSearchParams] = useSearchParams();
- const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const clientName = searchParams.get("clientName");
   const userId = searchParams.get("userId");
   /* const dateRange = searchParams.get("dateRange"); */
@@ -82,7 +82,7 @@ export function CancelationFilter() {
     });
   };
 
- return (
+  return (
     <>
       <Button
         variant="outline"
@@ -93,21 +93,19 @@ export function CancelationFilter() {
         <Filter className="h-4 w-4" />
         {showFilters ? "Ocultar filtros" : "Exibir filtros"}
       </Button>
-
       {showFilters && (
         <form
           onSubmit={handleSubmit(handleFilter)}
-          className="flex items-center gap-2 mb-5 flex-wrap"
+          className="items-center flex gap-2 mb-3 flex-wrap"
         >
-         
           <Input
             {...register("userId")}
-            className="h-8 w-auto"
+            className="h-8 w-[200px]"
             placeholder="ID do cliente"
           />
           <Input
             {...register("clientName")}
-            className="h-8 w-[320px]"
+            className="h-8 w-[250px]"
             placeholder="Nome do cliente"
           />
 
@@ -141,6 +139,30 @@ export function CancelationFilter() {
             )}
           />
 
+           <Controller
+            name="bairro"
+            control={control}
+            render={({ field: { onChange, value, disabled, name } }) => (
+              <Select
+                onValueChange={onChange}
+                disabled={disabled}
+                name={name}
+                value={value}
+              >
+                <SelectTrigger className="h-8 w-[250px]">
+                  <SelectValue placeholder="Selecione o bairro" />
+                </SelectTrigger>
+                <SelectContent className="h-[280px]">
+                  {bairrosCotia.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {item}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+
           <Button
             type="submit"
             className="bg-blue-500 hover:bg-blue-400 text-white"
@@ -152,8 +174,9 @@ export function CancelationFilter() {
             type="button"
             variant="outline"
             size="sm"
+            className="flex items-center justify-center"
           >
-            <X className="mr-2 h-4 w-4" /> Remover filtros
+            <X className="h-4 w-4" />
           </Button>
         </form>
       )}

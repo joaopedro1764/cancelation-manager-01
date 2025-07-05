@@ -1,29 +1,20 @@
-import { CalendarDays } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { TrendingUp, UserMinus } from "lucide-react";
+
 
 export function CancelationMonthsCard() {
   return (
-    <Card className="bg-gray-50 shadow rounded-md gap-3 cursor-pointer hover:transform hover:translate-y-3 duration-500">
-      <CardHeader>
-        <CardTitle className="font-bold flex gap-2 items-center text-2xl">
-          <CalendarDays strokeWidth={3} className="w-7 h-7 text-[#3B82F6]" />
-          Cancelamentos (mês)
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1 font-semibold">
-        <CardDescription className="flex flex-col">
-          <span className="text-2xl text-black font-black">80</span>
-          <span className="text-blue-400 font-semibold">
-            + 20% referente ao mês passado
-          </span>
-        </CardDescription>
-      </CardContent>
-    </Card>
+   <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:-translate-y-3 duration-500 ease-in-out">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-600">Cancelamentos (mês)</p>
+        <p className="text-3xl font-bold text-gray-900">80</p>
+        <p className="text-sm text-green-600 font-semibold flex items-center">
+          <TrendingUp className="h-4 w-4 mr-1" />
+          + 20% referente ao mês passado
+        </p>
+      </div>
+      <UserMinus className="h-12 w-12 text-orange-500" />
+    </div>
+  </div>
   );
 }

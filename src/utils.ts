@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 export const motivosCancelamento = [
   {
     id: "1",
@@ -300,6 +299,7 @@ export const pieData: RetentionProps[] = [
 export const newSearchRetention = z.object({
   userId: z.string().optional(),
   clientName: z.string().optional(),
+  bairro: z.string().optional(),
   reason: z.string().optional(),
   dateRange: z
     .object({
@@ -369,9 +369,60 @@ export type RetencoesItem = {
   nome?: string;
   idContrato?: string | number;
   idAtendimento?: string | number;
-  motivoCancelamento:string;
-  retencaoAplicada:string;
-  responsavel:stromg
+  motivoCancelamento: string;
+  retencaoAplicada: string;
+  responsavel: string
   [key: string]: any;
 };
 
+export const bairrosCotia = [
+  "Centro",
+  "Jardim da Glória",
+  "Jardim Caiapia",
+  "Jardim Sabiá",
+  "Granja Viana",
+  "Parque Rizzo",
+  "Jardim Petrópolis",
+  "Jardim Sandra",
+  "Atalaia",
+  "Jardim Arco-Íris",
+  "Vila Monte Serrat",
+  "Jardim Colibri",
+  "Jardim Torino",
+  "Jardim São Miguel",
+  "Jardim Nova Coimbra",
+  "Jardim Passargada",
+  "Jardim Nomura",
+  "Parque São George",
+  "Vila Santa Catarina",
+  "Jardim Santa Isabel",
+  "Caputera",
+  "Chácara Cantagalo",
+  "Jardim Leonor",
+  "Jardim Ísis",
+  "Jardim Barro Branco",
+  "Chácara Tropical",
+  "Jardim Rio das Pedras",
+  "Parque Miguel Mirizola",
+  "Paisagem Renoir",
+  "Vila Santo Antônio",
+  "Parque Dom Henrique",
+  "Residencial Parque das Rosas",
+  "Jardim Japão",
+  "Jardim das Flores",
+  "Jardim São Vicente",
+  "Jardim dos Ipês",
+  "Jardim Santa Maria",
+  "Jardim Belizário"
+];
+
+
+export type CustomTooltipProps = {
+  active?: boolean;
+  payload?: { payload: RetentionProps }[];
+  label?: string;
+};
+
+export type CustomLegend = {
+  payload?: { value: string; color: string; payload: RetentionProps }[];
+}
