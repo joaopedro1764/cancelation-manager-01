@@ -8,7 +8,7 @@ export function TopCancelledCondosCard() {
                     <p className="text-lg font-semibold text-gray-900">Condomínios Mais Cancelados</p>
                     <p className="text-sm text-gray-600">Últimos 30 dias</p>
                 </div>
-                <Building2 className="h-8 w-8 text-cyan-500" />
+                <Building2 className="h-8 w-8 text-blue-500" />
             </div>
             <div className="space-y-3">
                 <div className="flex justify-between items-center">

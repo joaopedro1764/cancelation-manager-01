@@ -309,6 +309,8 @@ export const newSearchRetention = z.object({
     .optional(),
 });
 
+
+
 export const months = [
   "Janeiro",
   "Fevereiro",
@@ -370,6 +372,7 @@ export type RetencoesItem = {
   idContrato?: string | number;
   idAtendimento?: string | number;
   motivoCancelamento: string;
+  plano:string;
   retencaoAplicada: string;
   responsavel: string
   [key: string]: any;

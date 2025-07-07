@@ -17,7 +17,8 @@ import { startOfMonth } from "date-fns";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-type NewSearchRetentionType = z.infer<typeof newSearchRetention>;
+
+type NewSearchRetentionType = z.infer<typeof newSearchRetention>; 
 
 export function CancelationFilter() {
   const [searchParams, setSearchParams] = useSearchParams();

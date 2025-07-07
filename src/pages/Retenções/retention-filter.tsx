@@ -9,21 +9,68 @@ import {
 } from "@/components/ui/select";
 import { Filter, Search, X } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import dadosCancelamentos from "../../dados_cancelamentos.json";
-import { months, setores } from "@/utils";
+import { months, motivosCancelamentos, newSearchRetention, setores } from "@/utils";
 import { useState } from "react";
+import type { z } from "zod";
+import { useSearchParams } from "react-router-dom";
+
+export type NewSearchRetentionType = z.infer<typeof newSearchRetention>;
+
 export function RetentionFilter() {
-  const { register, handleSubmit, control } = useForm();
 
   const [showFilters, setShowFilters] = useState(false);
 
-  function handleFilter() {
-    console.log("teste");
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const clientName = searchParams.get("clientName");
+  const userId = searchParams.get("userId");
+  const reason = searchParams.get("reason");
+
+  const { handleSubmit, register, control } = useForm<NewSearchRetentionType>({
+    values: {
+      clientName: clientName ?? "",
+      userId: userId ?? "",
+      reason: reason ?? "",
+    },
+  });
+
+  function handleFilter({
+    clientName,
+    userId,
+
+    reason,
+  }: NewSearchRetentionType) {
+    setSearchParams((state) => {
+      if (userId) {
+        state.set("userId", userId);
+      } else {
+        state.delete("userId");
+      }
+      if (clientName) {
+        state.set("clientName", clientName);
+      } else {
+        state.delete("clientName");
+      }
+      if (reason) {
+        state.set("reason", reason);
+      } else {
+        state.delete("reason");
+      }
+      return state;
+    });
   }
 
-  function handleClearFilter() {
-    return "";
-  }
+  const handleClearFilter = () => {
+    setSearchParams((state) => {
+      state.delete("userId");
+      state.delete("clientName");
+      state.delete("reason");
+      return state;
+    });
+  };
+
+  
   return (
     <>
       <Button
@@ -52,7 +99,7 @@ export function RetentionFilter() {
             className="h-8 w-[200px]"
             placeholder="Nome do cliente"
           />
-
+{/* 
           <Controller
             name="reason"
             control={control}
@@ -99,7 +146,7 @@ export function RetentionFilter() {
                 </SelectTrigger>
               </Select>
             )}
-          />
+          /> */}
 
           <Controller
             name="reason"
@@ -114,9 +161,9 @@ export function RetentionFilter() {
                 <SelectTrigger className="h-8 w-[250px]">
                   <SelectValue placeholder="Selecione o motivo" />
                   <SelectContent className="h-[280px]">
-                    {dadosCancelamentos.map((item) => (
-                      <SelectItem key={item.idcliente} value={item.nome}>
-                        {item.motivo}
+                    {motivosCancelamentos.map((item) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
                       </SelectItem>
                     ))}
                   </SelectContent>
