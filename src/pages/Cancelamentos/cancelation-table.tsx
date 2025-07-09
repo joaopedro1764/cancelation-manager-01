@@ -11,10 +11,12 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState, useTransition } from "react";
 import * as XLSX from "xlsx";
 import type { CancelamentoItem } from "@/utils";
+import { format, isValid, isWithinInterval, parse } from "date-fns";
+import { da } from "date-fns/locale";
 
 export function CancelationTable() {
   const [isLoading, startTransition] = useTransition();
-  
+
   const [cancelamentos, setCancelamentos] = useState<
     Record<string, CancelamentoItem[]>
   >({});
@@ -23,49 +25,65 @@ export function CancelationTable() {
   const itemsPerPage = 10;
 
   const [searchParams] = useSearchParams();
-  const clientName = searchParams.get("clientName");
-  const userId = searchParams.get("userId");
-  const reason = searchParams.get("reason");
+  const clientNameParam = searchParams.get("clientName");
+  const userIdParam = searchParams.get("userId");
+  const reasonParam = searchParams.get("reason");
+  const neighborhoodParam = searchParams.get("neighborhood");
+  const dateFromParam = searchParams.get("dateFrom");
+  const dateToParam = searchParams.get("dateTo");
+
+
+console.log(dateFromParam);
 
   useEffect(() => {
-    
-   startTransition(() => {
-
-     fetch("/planilha.xlsx")
-      .then((res) => res.arrayBuffer())
-      .then((buffer) => {
-        const workbook = XLSX.read(buffer, { type: "array" });
-        const nomesDasAbas = workbook.SheetNames;
-
-        setAbaAtiva(nomesDasAbas[2] || nomesDasAbas[0]);
-
-        const dados: Record<string, CancelamentoItem[]> = {};
-        nomesDasAbas.forEach((aba) => {
-          const sheet = workbook.Sheets[aba];
-          const json = XLSX.utils.sheet_to_json<CancelamentoItem>(sheet, {
-            defval: "",
+    startTransition(() => {
+      fetch("/planilha.xlsx")
+        .then((res) => res.arrayBuffer())
+        .then((buffer) => {
+          const workbook = XLSX.read(buffer, { type: "array" });
+          const nomesDasAbas = workbook.SheetNames;
+          setAbaAtiva(nomesDasAbas[2] || nomesDasAbas[0]);
+          const dados: Record<string, CancelamentoItem[]> = {};
+          nomesDasAbas.forEach((aba) => {
+            const sheet = workbook.Sheets[aba];
+            const json = XLSX.utils.sheet_to_json<CancelamentoItem>(sheet, {
+              defval: "", raw: false,
+            });
+            dados[aba] = json;
           });
-          dados[aba] = json;
+          setCancelamentos(dados);
         });
+    })
+  }, []);
 
-        setCancelamentos(dados);
-     
-      });
-
-      
-  })}, []);
 
   const dadosDaAbaAtual = cancelamentos[abaAtiva] || [];
 
   const cancelamentosFiltrados = dadosDaAbaAtual.filter((item) => {
-    const nome = item.nome?.toLowerCase() ?? "";
-    const idCliente = String(item.idCliente ?? "").toLowerCase();
-    const motivo = item.motivoReal?.toLowerCase() ?? "";
 
+    const name = item.nome?.toLowerCase() ?? "";
+    const idCliente = String(item.idCliente ?? "").toLowerCase();
+    const reason = item.motivoReal?.toLowerCase() ?? "";
+    const neighborhood = item.endereco?.toLowerCase() ?? "";
+
+     const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
+    ? new Date(item.dataCancelamento)
+    : null;
+
+
+  
+  const dataFrom = dateFromParam ? parse(dateFromParam, "dd/MM/yyyy", new Date()) : null;
+  const dataTo = dateToParam ? parse(dateToParam, "dd/MM/yyyy", new Date()) : null;
+
+  const isInDateRange = parsedDate && dataFrom && dataTo
+    ? isWithinInterval(format(new Date(parsedDate), "dd/MM/yyyy"), { start: dataTo, end: dataFrom })
+    : true;
     return (
-      (!clientName || nome.includes(clientName.toLowerCase())) &&
-      (!userId || idCliente.includes(userId.toLowerCase())) &&
-      (!reason || motivo.includes("Cancelamento - " + reason.toLowerCase()))
+      (!clientNameParam || name.includes(clientNameParam.toLowerCase())) &&
+      (!neighborhoodParam || neighborhood.includes(neighborhoodParam.toLowerCase())) &&
+      (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
+      (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
+      isInDateRange
     );
   });
 
@@ -100,25 +118,28 @@ export function CancelationTable() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [clientName, userId, reason]);
+  }, [clientNameParam, userIdParam, reasonParam]);
 
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
       <Table>
         <TableHeader className="sticky top-0 bg-gray-50 tracking-wide z-10 border-b border-gray-200 text-gray-700 text-sm">
+
           <TableRow className="bg-gray-50">
             <TableHead className="font-bold">ID cliente</TableHead>
             <TableHead className="font-bold">Cliente</TableHead>
             <TableHead className="font-bold">ID contrato</TableHead>
             <TableHead className="font-bold">ID atendimento</TableHead>
             <TableHead className="font-bold">Tempo ativo</TableHead>
+            <TableHead className="font-bold">Data cancelamento</TableHead>
             <TableHead className="font-bold">Bairro</TableHead>
+            <TableHead className="font-bold">Condominio</TableHead>
             <TableHead className="font-bold">Motivo real</TableHead>
             <TableHead className="font-bold">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="hover:cursor-pointer">
-           {
+          {
             isLoading && (
               <TableRow>
                 <TableCell colSpan={8} className="h-24 text-center">
@@ -139,7 +160,7 @@ export function CancelationTable() {
           ) : (
             paginatedItems.map((item, index) => (
               <TableRow key={index} className="hover:bg-gray-100 transition">
-                <TableCell>{item.idCliente}</TableCell>
+                <TableCell className="w-[100px]">{item.idCliente}</TableCell>
                 <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
                   {item.nome}
                 </TableCell>
@@ -153,7 +174,24 @@ export function CancelationTable() {
                   )}
                 </TableCell>
                 <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-200 text-gray-800">
+
+                    {item.dataCancelamento ? (
+                      isValid(new Date(item.dataCancelamento)) ? (
+                        format(parse(item.dataCancelamento, "M/d/yy", new Date()), "dd/MM/yyyy")
+                      ) : (
+                        item.dataCancelamento
+                      )
+                    ) : (
+                      "N/A"
+                    )}
+                  </span>
+                </TableCell>
+                <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
                   {item.bairro}
+                </TableCell>
+                <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
+                  {item.condominio || "Não é condomínio"}
                 </TableCell>
                 <TableCell
                   title={item.motivoReal}
@@ -220,8 +258,8 @@ export function CancelationTable() {
                 key={pageNumber}
                 onClick={() => goToPage(pageNumber)}
                 className={`px-3 py-2 rounded-md border text-sm font-medium ${pageNumber === currentPage
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'border-gray-300 hover:bg-gray-50'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'border-gray-300 hover:bg-gray-50'
                   }`}
               >
                 {pageNumber}

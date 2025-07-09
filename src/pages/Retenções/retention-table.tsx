@@ -49,6 +49,8 @@ export function RetentionTable() {
         });
     })
   }, []);
+  
+  console.log("Dados carregados:", retencoes);
 
   const dadosDaAbaAtual = retencoes[abaAtiva] || [];
 
@@ -57,9 +59,6 @@ export function RetentionTable() {
     const nome = item.nome?.toLowerCase() ?? "";
     const idCliente = String(item.idCliente ?? "").toLowerCase();
     const motivo = item.motivoCancelamento?.toLowerCase() ?? "";
-
-    console.log(motivo)
-    console.log(reason)
 
     return (
       (!clientName || nome.includes(clientName.toLowerCase())) &&

@@ -16,9 +16,10 @@ import type { DateRange } from "react-day-picker";
 import { startOfMonth } from "date-fns";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { format } from "date-fns";
 
 
-type NewSearchRetentionType = z.infer<typeof newSearchRetention>; 
+type NewSearchRetentionType = z.infer<typeof newSearchRetention>;
 
 export function CancelationFilter() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,8 +51,9 @@ export function CancelationFilter() {
   function handleFilter({
     clientName,
     userId,
-
     reason,
+    neighborhood,
+    dateRange
   }: NewSearchRetentionType) {
     setSearchParams((state) => {
       if (userId) {
@@ -69,6 +71,21 @@ export function CancelationFilter() {
       } else {
         state.delete("reason");
       }
+      if (dateRange?.from && dateRange?.to) {
+        const formattedFrom = format(dateRange.from, "dd/MM/yyyy");
+        const formattedTo = format(dateRange.to, "dd/MM/yyyy");
+
+        state.set("dateFrom", formattedFrom);
+        state.set("dateTo", formattedTo);
+      } else {
+        state.delete("dateFrom");
+        state.delete("dateTo");
+      }
+      if (neighborhood) {
+        state.set("neighborhood", neighborhood);
+      } else {
+        state.delete("neighborhood");
+      }
       return state;
     });
   }
@@ -78,7 +95,9 @@ export function CancelationFilter() {
       state.delete("userId");
       state.delete("clientName");
       state.delete("reason");
-      /*  state.set("page", "1"); */
+      state.delete("dateFrom");
+      state.delete("dateTo");
+      state.delete("neighborhood")
       return state;
     });
   };
@@ -140,8 +159,8 @@ export function CancelationFilter() {
             )}
           />
 
-           <Controller
-            name="bairro"
+          <Controller
+            name="neighborhood"
             control={control}
             render={({ field: { onChange, value, disabled, name } }) => (
               <Select

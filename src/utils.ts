@@ -299,7 +299,7 @@ export const pieData: RetentionProps[] = [
 export const newSearchRetention = z.object({
   userId: z.string().optional(),
   clientName: z.string().optional(),
-  bairro: z.string().optional(),
+  neighborhood: z.string().optional(),
   reason: z.string().optional(),
   dateRange: z
     .object({
@@ -363,6 +363,8 @@ export type CancelamentoItem = {
   tempoAtivo?: string;
   bairro?: string;
   motivoReal?: string;
+  dataCancelamento: string;
+  condominio?: string;
   [key: string]: any;
 };
 
@@ -374,7 +376,7 @@ export type RetencoesItem = {
   motivoCancelamento: string;
   plano:string;
   retencaoAplicada: string;
-  responsavel: string
+  responsavel: string;
   [key: string]: any;
 };
 
