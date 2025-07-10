@@ -13,7 +13,6 @@ import { Filter, Search, X } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 import type { DateRange } from "react-day-picker";
-import { startOfMonth } from "date-fns";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { format } from "date-fns";
@@ -26,16 +25,12 @@ export function CancelationFilter() {
   const [showFilters, setShowFilters] = useState(false);
   const clientName = searchParams.get("clientName");
   const userId = searchParams.get("userId");
-  /* const dateRange = searchParams.get("dateRange"); */
   const reason = searchParams.get("reason");
 
-  const [dateRangeCalendar, setDateRangeCalendar] = useState<
-    DateRange | undefined
-  >({
-    from: startOfMonth(new Date()),
-    to: new Date(),
-  });
-
+const [dateRangeCalendar, setDateRangeCalendar] = useState<DateRange | undefined>({
+  from: new Date(2025, 4, 1), 
+  to: new Date(2025, 4, 30),
+});
   const { handleSubmit, register, control } = useForm<NewSearchRetentionType>({
     values: {
       dateRange: {

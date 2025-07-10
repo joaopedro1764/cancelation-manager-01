@@ -7,23 +7,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EllipsisVertical, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
-import { useEffect, useState, useTransition } from "react";
-import * as XLSX from "xlsx";
-import type { CancelamentoItem } from "@/utils";
+import {  useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { format, isValid, isWithinInterval, parse } from "date-fns";
-import { da } from "date-fns/locale";
+import { usePlanilha } from "@/api/cancelations";
 
 export function CancelationTable() {
-  const [isLoading, startTransition] = useTransition();
 
-  const [cancelamentos, setCancelamentos] = useState<
-    Record<string, CancelamentoItem[]>
-  >({});
-  const [abaAtiva, setAbaAtiva] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const [searchParams] = useSearchParams();
   const clientNameParam = searchParams.get("clientName");
   const userIdParam = searchParams.get("userId");
@@ -33,59 +25,36 @@ export function CancelationTable() {
   const dateToParam = searchParams.get("dateTo");
 
 
-console.log(dateFromParam);
 
-  useEffect(() => {
-    startTransition(() => {
-      fetch("/planilha.xlsx")
-        .then((res) => res.arrayBuffer())
-        .then((buffer) => {
-          const workbook = XLSX.read(buffer, { type: "array" });
-          const nomesDasAbas = workbook.SheetNames;
-          setAbaAtiva(nomesDasAbas[2] || nomesDasAbas[0]);
-          const dados: Record<string, CancelamentoItem[]> = {};
-          nomesDasAbas.forEach((aba) => {
-            const sheet = workbook.Sheets[aba];
-            const json = XLSX.utils.sheet_to_json<CancelamentoItem>(sheet, {
-              defval: "", raw: false,
-            });
-            dados[aba] = json;
-          });
-          setCancelamentos(dados);
-        });
-    })
-  }, []);
+  const {data, isLoading} = usePlanilha();
 
+  const dadosDaAbaAtual = data?.dados[data.abaPadrao] || [];
 
-  const dadosDaAbaAtual = cancelamentos[abaAtiva] || [];
+const cancelamentosFiltrados = dadosDaAbaAtual.filter((item) => {
+  const name = item.nome?.toLowerCase() ?? "";
+  const idCliente = String(item.idCliente ?? "").toLowerCase();
+  const reason = item.motivoReal?.toLowerCase() ?? "";
+  const neighborhood = item.bairro?.toLowerCase() ?? "";
 
-  const cancelamentosFiltrados = dadosDaAbaAtual.filter((item) => {
-
-    const name = item.nome?.toLowerCase() ?? "";
-    const idCliente = String(item.idCliente ?? "").toLowerCase();
-    const reason = item.motivoReal?.toLowerCase() ?? "";
-    const neighborhood = item.endereco?.toLowerCase() ?? "";
-
-     const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
+  const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
     ? new Date(item.dataCancelamento)
     : null;
 
-
-  
   const dataFrom = dateFromParam ? parse(dateFromParam, "dd/MM/yyyy", new Date()) : null;
   const dataTo = dateToParam ? parse(dateToParam, "dd/MM/yyyy", new Date()) : null;
 
   const isInDateRange = parsedDate && dataFrom && dataTo
-    ? isWithinInterval(format(new Date(parsedDate), "dd/MM/yyyy"), { start: dataTo, end: dataFrom })
+    ? isWithinInterval(parsedDate, { start: dataFrom, end: dataTo })
     : true;
-    return (
-      (!clientNameParam || name.includes(clientNameParam.toLowerCase())) &&
-      (!neighborhoodParam || neighborhood.includes(neighborhoodParam.toLowerCase())) &&
-      (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
-      (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
-      isInDateRange
-    );
-  });
+
+  return (
+    (!clientNameParam || name.includes(clientNameParam.toLowerCase())) &&
+    (!neighborhoodParam || neighborhood.includes(neighborhoodParam.toLowerCase())) &&
+    (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
+    (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
+    isInDateRange
+  );
+});
 
   const totalPages = Math.ceil(cancelamentosFiltrados.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -93,7 +62,6 @@ console.log(dateFromParam);
     startIndex,
     startIndex + itemsPerPage
   );
-
 
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
@@ -114,7 +82,6 @@ console.log(dateFromParam);
 
     return pages;
   };
-
 
   useEffect(() => {
     setCurrentPage(1);
