@@ -7,10 +7,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EllipsisVertical, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
-import {  useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { format, isValid, isWithinInterval, parse } from "date-fns";
-import { usePlanilha } from "@/api/cancelations";
+import { usePlanilha } from "@/api/planilha";
 
 export function CancelationTable() {
 
@@ -26,39 +26,40 @@ export function CancelationTable() {
 
 
 
-  const {data, isLoading} = usePlanilha();
+  const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" });
 
-  const dadosDaAbaAtual = data?.dados[data.abaPadrao] || [];
+  console.log("Cancelamentos:", cancelamentos);
 
-const cancelamentosFiltrados = dadosDaAbaAtual.filter((item) => {
-  const name = item.nome?.toLowerCase() ?? "";
-  const idCliente = String(item.idCliente ?? "").toLowerCase();
-  const reason = item.motivoReal?.toLowerCase() ?? "";
-  const neighborhood = item.bairro?.toLowerCase() ?? "";
 
-  const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
-    ? new Date(item.dataCancelamento)
-    : null;
+  const cancelamentosFiltrados = cancelamentos?.filter((item) => {
+    const name = item.nome?.toLowerCase() ?? "";
+    const idCliente = String(item.idCliente ?? "").toLowerCase();
+    const reason = item.motivoReal?.toLowerCase() ?? "";
+    const neighborhood = item.bairro?.toLowerCase() ?? "";
 
-  const dataFrom = dateFromParam ? parse(dateFromParam, "dd/MM/yyyy", new Date()) : null;
-  const dataTo = dateToParam ? parse(dateToParam, "dd/MM/yyyy", new Date()) : null;
+    const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
+      ? new Date(item.dataCancelamento)
+      : null;
 
-  const isInDateRange = parsedDate && dataFrom && dataTo
-    ? isWithinInterval(parsedDate, { start: dataFrom, end: dataTo })
-    : true;
+    const dataFrom = dateFromParam ? parse(dateFromParam, "dd/MM/yyyy", new Date()) : null;
+    const dataTo = dateToParam ? parse(dateToParam, "dd/MM/yyyy", new Date()) : null;
 
-  return (
-    (!clientNameParam || name.includes(clientNameParam.toLowerCase())) &&
-    (!neighborhoodParam || neighborhood.includes(neighborhoodParam.toLowerCase())) &&
-    (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
-    (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
-    isInDateRange
-  );
-});
+    const isInDateRange = parsedDate && dataFrom && dataTo
+      ? isWithinInterval(parsedDate, { start: dataFrom, end: dataTo })
+      : true;
 
-  const totalPages = Math.ceil(cancelamentosFiltrados.length / itemsPerPage);
+    return (
+      (!clientNameParam || name.includes(clientNameParam.toLowerCase())) &&
+      (!neighborhoodParam || neighborhood.includes(neighborhoodParam.toLowerCase())) &&
+      (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
+      (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
+      isInDateRange
+    );
+  });
+
+  const totalPages = Math.ceil((cancelamentosFiltrados?.length ?? 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedItems = cancelamentosFiltrados.slice(
+  const paginatedItems = cancelamentosFiltrados?.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -118,14 +119,14 @@ const cancelamentosFiltrados = dadosDaAbaAtual.filter((item) => {
               </TableRow>
             )
           }
-          {paginatedItems.length === 0 ? (
+          {paginatedItems && paginatedItems?.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="h-24 text-center">
                 Nenhum resultado encontrado.
               </TableCell>
             </TableRow>
           ) : (
-            paginatedItems.map((item, index) => (
+            paginatedItems && paginatedItems.map((item, index) => (
               <TableRow key={index} className="hover:bg-gray-100 transition">
                 <TableCell className="w-[100px]">{item.idCliente}</TableCell>
                 <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
@@ -180,7 +181,7 @@ const cancelamentosFiltrados = dadosDaAbaAtual.filter((item) => {
         <div className="flex items-center justify-between mt-4 px-2">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">
-              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, cancelamentosFiltrados.length)} de {cancelamentosFiltrados.length} resultados
+              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, cancelamentosFiltrados?.length ?? 0)} de {(cancelamentosFiltrados?.length ?? 0)} resultados
             </span>
           </div>
 

@@ -8,54 +8,22 @@ import {
 } from "@/components/ui/table";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useState, useTransition } from "react";
-import * as XLSX from "xlsx";
-import type { RetencoesItem } from "@/utils";
+import { useEffect, useState } from "react";
+import { usePlanilha } from "@/api/planilha";
 
 export function RetentionTable() {
 
-  const [isLoading, startTransition] = useTransition();
-  const [retencoes, setRetencoes] = useState<
-    Record<string, RetencoesItem[]>
-  >({});
-  const [abaAtiva, setAbaAtiva] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const [searchParams] = useSearchParams();
   const clientName = searchParams.get("clientName");
   const userId = searchParams.get("userId");
   const reason = searchParams.get("reason");
 
-  useEffect(() => {
-    startTransition(() => {
-      fetch("/planilha.xlsx")
-        .then((res) => res.arrayBuffer())
-        .then((buffer) => {
-          const workbook = XLSX.read(buffer, { type: "array" });
-          const nomesDasAbas = workbook.SheetNames;
+  const { data: retencoes, isLoading } = usePlanilha({ aba: "Retenções Outros Setores" });
 
-          setAbaAtiva(nomesDasAbas[4] || nomesDasAbas[0]);
-
-          const dados: Record<string, RetencoesItem[]> = {};
-          nomesDasAbas.forEach((aba) => {
-            const sheet = workbook.Sheets[aba];
-            const json = XLSX.utils.sheet_to_json<RetencoesItem>(sheet, {
-              defval: "",
-            });
-            dados[aba] = json;
-          });
-          setRetencoes(dados);
-        });
-    })
-  }, []);
-  
-  console.log("Dados carregados:", retencoes);
-
-  const dadosDaAbaAtual = retencoes[abaAtiva] || [];
-
-
-  const retencoesFiltradas = dadosDaAbaAtual.filter((item) => {
+ 
+  const retencoesFiltradas = retencoes?.filter((item) => {
     const nome = item.nome?.toLowerCase() ?? "";
     const idCliente = String(item.idCliente ?? "").toLowerCase();
     const motivo = item.motivoCancelamento?.toLowerCase() ?? "";
@@ -67,9 +35,9 @@ export function RetentionTable() {
     );
   });
 
-  const totalPages = Math.ceil(retencoesFiltradas.length / itemsPerPage);
+  const totalPages = Math.ceil((retencoesFiltradas?.length ?? 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedItems = retencoesFiltradas.slice(
+  const paginatedItems = (retencoesFiltradas ?? []).slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -168,7 +136,7 @@ export function RetentionTable() {
         <div className="flex items-center justify-between mt-4 px-2">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">
-              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, retencoesFiltradas.length)} de {retencoesFiltradas.length} resultados
+              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, (retencoesFiltradas?.length ?? 0))} de {(retencoesFiltradas?.length ?? 0)} resultados
             </span>
           </div>
 
