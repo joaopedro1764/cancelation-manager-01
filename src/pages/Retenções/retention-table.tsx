@@ -6,32 +6,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { usePlanilha } from "@/api/planilha";
+import { Pagination } from "@/components/Pagination";
 
 export function RetentionTable() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [searchParams] = useSearchParams();
-  const clientName = searchParams.get("clientName");
-  const userId = searchParams.get("userId");
-  const reason = searchParams.get("reason");
+  const clientNameParam = searchParams.get("clientName");
+  const userIdParam = searchParams.get("userId");
+  const reasonParam = searchParams.get("reason");
+  const sectorParam = searchParams.get("sector");
 
   const { data: retencoes, isLoading } = usePlanilha({ aba: "Retenções Outros Setores" });
 
- 
   const retencoesFiltradas = retencoes?.filter((item) => {
+    if (!item.nome) return;
     const nome = item.nome?.toLowerCase() ?? "";
     const idCliente = String(item.idCliente ?? "").toLowerCase();
     const motivo = item.motivoCancelamento?.toLowerCase() ?? "";
-
+    const sector = item.setor?.toLowerCase() ?? "";
     return (
-      (!clientName || nome.includes(clientName.toLowerCase())) &&
-      (!userId || idCliente.includes(userId.toLowerCase())) &&
-      (!reason || motivo.includes(`cancelamento - ${reason.toLowerCase()}`))
+      (!clientNameParam || nome.includes(clientNameParam.toLowerCase())) &&
+      (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
+      (!sectorParam || sector.includes(sectorParam.toLowerCase())) &&
+      (!reasonParam || motivo.includes(`retencao - ${reasonParam.toLowerCase()}`))
     );
   });
 
@@ -63,7 +65,7 @@ export function RetentionTable() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [clientName, userId, reason]);
+  }, [clientNameParam, userIdParam, reasonParam]);
 
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
@@ -78,6 +80,7 @@ export function RetentionTable() {
             <TableHead className="font-bold">Motivo cancelamento</TableHead>
             <TableHead className="font-bold">Retenção aplicada</TableHead>
             <TableHead className="font-bold">Responsável</TableHead>
+            <TableHead className="font-bold">Setor</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="hover:cursor-pointer">
@@ -125,6 +128,11 @@ export function RetentionTable() {
                 >
                   {item.responsavel}
                 </TableCell>
+                <TableCell
+                  className="whitespace-nowrap max-w-[140px] truncate"
+                >
+                  {item.setor}
+                </TableCell>
               </TableRow>
             ))
           )}
@@ -132,96 +140,19 @@ export function RetentionTable() {
       </Table>
 
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">
-              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, (retencoesFiltradas?.length ?? 0))} de {(retencoesFiltradas?.length ?? 0)} resultados
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-
-            <button
-              onClick={goToFirstPage}
-              disabled={currentPage === 1}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Primeira página"
-            >
-              <ChevronsLeft className="w-4 h-4" />
-            </button>
-
-
-            <button
-              onClick={goToPreviousPage}
-              disabled={currentPage === 1}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Página anterior"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-
-            {currentPage > 3 && (
-              <>
-                <button
-                  onClick={() => goToPage(1)}
-                  className="px-3 py-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50"
-                >
-                  1
-                </button>
-                {currentPage > 4 && (
-                  <span className="px-2 py-2 text-sm text-gray-500">...</span>
-                )}
-              </>
-            )}
-
-            {getVisiblePageNumbers().map((pageNumber) => (
-              <button
-                key={pageNumber}
-                onClick={() => goToPage(pageNumber)}
-                className={`px-3 py-2 rounded-md border text-sm font-medium ${pageNumber === currentPage
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                {pageNumber}
-              </button>
-            ))}
-
-            {currentPage < totalPages - 2 && (
-              <>
-                {currentPage < totalPages - 3 && (
-                  <span className="px-2 py-2 text-sm text-gray-500">...</span>
-                )}
-                <button
-                  onClick={() => goToPage(totalPages)}
-                  className="px-3 py-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-
-            <button
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Próxima página"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={goToLastPage}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Última página"
-            >
-              <ChevronsRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        itemsPerPage={itemsPerPage}
+        totalItems={retencoesFiltradas?.length ?? 0}
+        startIndex={startIndex}
+        getVisiblePageNumbers={getVisiblePageNumbers}
+        goToFirstPage={goToFirstPage}
+        goToPreviousPage={goToPreviousPage}
+        goToPage={goToPage}
+        goToNextPage={goToNextPage}
+        goToLastPage={goToLastPage}
+      />
     </div>
   );
 }

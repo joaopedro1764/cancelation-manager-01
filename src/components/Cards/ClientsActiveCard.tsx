@@ -10,7 +10,7 @@ export function ClientsActiveCard() {
           <p className="text-3xl font-bold text-gray-900">765</p>
           <p className="text-sm text-green-600 font-semibold flex items-center">
             <TrendingUp className="h-4 w-4 mr-1" />
-            + 20% referente ao mês passado
+            + 20% referente vs mês anterior
           </p>
         </div>
         <Users className="h-12 w-12 text-blue-500" />

@@ -19,27 +19,26 @@ export type NewSearchRetentionType = z.infer<typeof newSearchRetention>;
 export function RetentionFilter() {
 
   const [showFilters, setShowFilters] = useState(false);
-
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const clientName = searchParams.get("clientName");
   const userId = searchParams.get("userId");
   const reason = searchParams.get("reason");
-
+  const sector = searchParams.get("sector");
   const { handleSubmit, register, control } = useForm<NewSearchRetentionType>({
     values: {
       clientName: clientName ?? "",
       userId: userId ?? "",
       reason: reason ?? "",
+      sector: sector ?? "",
     },
   });
 
   function handleFilter({
     clientName,
     userId,
-
     reason,
+    sector,
   }: NewSearchRetentionType) {
     setSearchParams((state) => {
       if (userId) {
@@ -57,6 +56,11 @@ export function RetentionFilter() {
       } else {
         state.delete("reason");
       }
+      if (sector) {
+        state.set("sector", sector);
+      } else {
+        state.delete("sector");
+      }
       return state;
     });
   }
@@ -66,11 +70,12 @@ export function RetentionFilter() {
       state.delete("userId");
       state.delete("clientName");
       state.delete("reason");
+      state.delete("sector");
       return state;
     });
   };
 
-  
+
   return (
     <>
       <Button
@@ -88,18 +93,18 @@ export function RetentionFilter() {
           onSubmit={handleSubmit(handleFilter)}
           className="flex items-center gap-2 mb-5"
         >
-          <span className="text-sm font-semibold">Filtros</span>
+         
           <Input
             {...register("userId")}
-            className="h-8 w-auto"
-            placeholder="ID do cliente"
+            className="h-8 w-[100px]"
+            placeholder="ID cliente"
           />
           <Input
             {...register("clientName")}
             className="h-8 w-[200px]"
-            placeholder="Nome do cliente"
+            placeholder="Nome cliente"
           />
-{/* 
+
           <Controller
             name="reason"
             control={control}
@@ -125,7 +130,7 @@ export function RetentionFilter() {
           />
 
           <Controller
-            name="reason"
+            name="sector"
             control={control}
             render={({ field: { onChange, value, disabled, name } }) => (
               <Select
@@ -146,7 +151,7 @@ export function RetentionFilter() {
                 </SelectTrigger>
               </Select>
             )}
-          /> */}
+          />
 
           <Controller
             name="reason"
@@ -160,6 +165,29 @@ export function RetentionFilter() {
               >
                 <SelectTrigger className="h-8 w-[250px]">
                   <SelectValue placeholder="Selecione o motivo" />
+                  <SelectContent className="h-[280px]">
+                    {motivosCancelamentos.map((item) => (
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </SelectTrigger>
+              </Select>
+            )}
+          />
+           <Controller
+            name="reason"
+            control={control}
+            render={({ field: { onChange, value, disabled, name } }) => (
+              <Select
+                onValueChange={onChange}
+                disabled={disabled}
+                name={name}
+                value={value}
+              >
+                <SelectTrigger className="h-8 w-[250px]">
+                  <SelectValue placeholder="Selecione o colaborador" />
                   <SelectContent className="h-[280px]">
                     {motivosCancelamentos.map((item) => (
                       <SelectItem key={item} value={item}>

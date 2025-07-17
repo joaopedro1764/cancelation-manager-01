@@ -6,15 +6,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EllipsisVertical, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { format, isValid, isWithinInterval, parse } from "date-fns";
 import { usePlanilha } from "@/api/planilha";
+import { Pagination } from "@/components/Pagination";
+
 
 export function CancelationTable() {
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" });
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
   const [searchParams] = useSearchParams();
   const clientNameParam = searchParams.get("clientName");
@@ -23,20 +27,14 @@ export function CancelationTable() {
   const neighborhoodParam = searchParams.get("neighborhood");
   const dateFromParam = searchParams.get("dateFrom");
   const dateToParam = searchParams.get("dateTo");
-
-
-
-  const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" });
-
-  console.log("Cancelamentos:", cancelamentos);
-
+  const planParam = searchParams.get("plan");
 
   const cancelamentosFiltrados = cancelamentos?.filter((item) => {
     const name = item.nome?.toLowerCase() ?? "";
     const idCliente = String(item.idCliente ?? "").toLowerCase();
     const reason = item.motivoReal?.toLowerCase() ?? "";
     const neighborhood = item.bairro?.toLowerCase() ?? "";
-
+    const plan = item.plano?.toLowerCase() ?? "";
     const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
       ? new Date(item.dataCancelamento)
       : null;
@@ -49,9 +47,10 @@ export function CancelationTable() {
       : true;
 
     return (
-      (!clientNameParam || name.includes(clientNameParam.toLowerCase())) &&
+      (!clientNameParam || name.includes(clientNameParam.trim().toLowerCase())) &&
       (!neighborhoodParam || neighborhood.includes(neighborhoodParam.toLowerCase())) &&
-      (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
+      (!userIdParam || idCliente.includes(userIdParam.trim().toLowerCase())) &&
+      (!planParam || plan.includes(planParam.trim().toLowerCase())) &&
       (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
       isInDateRange
     );
@@ -88,6 +87,38 @@ export function CancelationTable() {
     setCurrentPage(1);
   }, [clientNameParam, userIdParam, reasonParam]);
 
+
+  interface MotivoCores {
+    [motivo: string]: string;
+  }
+
+  type GetMotivoColor = (motivo: string) => string;
+
+  const getMotivoColor: GetMotivoColor = (motivo) => {
+    const cores: MotivoCores = {
+      "Mudanca de Endereco (Inviabilidade Tecnica)": "bg-blue-100 text-blue-800",
+      "Solicitacao de agendamento nao atendida": "bg-blue-100 text-blue-800",
+      "Insatisfacao com servico prestado": "bg-red-100 text-red-800",
+      "Insatisfação com Streaming": "bg-red-100 text-red-800",
+      "Corte de gastos": "bg-yellow-100 text-yellow-800",
+      "Insatisfacao com valor do servico": "bg-yellow-100 text-yellow-800",
+      "Trocou de Provedor (Melhor Proposta Financeira)": "bg-yellow-100 text-yellow-800",
+      "Pessoal nao Detalhado": "bg-gray-100 text-gray-800",
+      "Falecimento do Titular": "bg-gray-200 text-gray-700",
+      "Empresa fechou": "bg-gray-200 text-gray-700",
+      "Pausa no Contrato": "bg-gray-100 text-gray-800",
+      "Insatisfacao com atendimento": "bg-pink-100 text-pink-800",
+      "Trocou de provedor (Pacote dados moveis incluso)": "bg-purple-100 text-purple-800",
+      "Trocou de provedor (Pacote de TV incluso)": "bg-purple-100 text-purple-800",
+      "Mudanca para local que ja possui Nmultifibra": "bg-purple-100 text-purple-800",
+      "Termino de contrato": "bg-green-100 text-green-800",
+      "Fraude na contratação": "bg-orange-100 text-orange-800",
+      "Direito do Consumidor 7 dias": "bg-orange-100 text-orange-800",
+    };
+
+    return cores[motivo] || "bg-gray-100 text-gray-800";
+  };
+
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
       <Table>
@@ -96,13 +127,12 @@ export function CancelationTable() {
           <TableRow className="bg-gray-50">
             <TableHead className="font-bold">ID cliente</TableHead>
             <TableHead className="font-bold">Cliente</TableHead>
-            <TableHead className="font-bold">ID contrato</TableHead>
-            <TableHead className="font-bold">ID atendimento</TableHead>
-            <TableHead className="font-bold">Tempo ativo</TableHead>
+            <TableHead className="font-bold">Plano</TableHead>
+            <TableHead className="font-bold">Motivo real</TableHead>
             <TableHead className="font-bold">Data cancelamento</TableHead>
             <TableHead className="font-bold">Bairro</TableHead>
             <TableHead className="font-bold">Condominio</TableHead>
-            <TableHead className="font-bold">Motivo real</TableHead>
+            <TableHead className="font-bold">Tempo ativo</TableHead>
             <TableHead className="font-bold">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -129,20 +159,21 @@ export function CancelationTable() {
             paginatedItems && paginatedItems.map((item, index) => (
               <TableRow key={index} className="hover:bg-gray-100 transition">
                 <TableCell className="w-[100px]">{item.idCliente}</TableCell>
-                <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
+                <TableCell title={item.nome} className="max-w-[140px] truncate whitespace-nowrap overflow-hidden">
                   {item.nome}
                 </TableCell>
-                <TableCell>{item.idContrato}</TableCell>
-                <TableCell>{item.idAtendimento}</TableCell>
+                <TableCell title={item.plano} className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">{item.plano}</TableCell>
+
+
                 <TableCell>
-                  {item.tempoAtivo && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                      {item.tempoAtivo}
+                  {item.motivoReal && (
+                    <span className={`px-2 py-1 text-xs rounded-full font-semibold whitespace-nowrap ${getMotivoColor(item.motivoReal)}`}>
+                      {item.motivoReal}
                     </span>
                   )}
                 </TableCell>
                 <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-200 text-gray-800">
+                  <span className="inline-flex items-center font-semibold px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-500">
 
                     {item.dataCancelamento ? (
                       isValid(new Date(item.dataCancelamento)) ? (
@@ -161,14 +192,15 @@ export function CancelationTable() {
                 <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
                   {item.condominio || "Não é condomínio"}
                 </TableCell>
-                <TableCell
-                  title={item.motivoReal}
-                  className="whitespace-nowrap max-w-[140px] truncate"
-                >
-                  {item.motivoReal}
-                </TableCell>
                 <TableCell>
-                  <EllipsisVertical className="w-5 h-5" />
+                  {item.tempoAtivo && (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full max-w-[120px] truncate whitespace-nowrap overflow-hidden">
+                      {item.tempoAtivo}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="flex justify-center">
+                  <EllipsisVertical onClick={() => alert("oi")} className="w-5 h-5" />
                 </TableCell>
               </TableRow>
             ))
@@ -177,96 +209,19 @@ export function CancelationTable() {
       </Table>
 
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">
-              Mostrando {startIndex + 1} a {Math.min(startIndex + itemsPerPage, cancelamentosFiltrados?.length ?? 0)} de {(cancelamentosFiltrados?.length ?? 0)} resultados
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1">
-
-            <button
-              onClick={goToFirstPage}
-              disabled={currentPage === 1}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Primeira página"
-            >
-              <ChevronsLeft className="w-4 h-4" />
-            </button>
-
-
-            <button
-              onClick={goToPreviousPage}
-              disabled={currentPage === 1}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Página anterior"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-
-            {currentPage > 3 && (
-              <>
-                <button
-                  onClick={() => goToPage(1)}
-                  className="px-3 py-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50"
-                >
-                  1
-                </button>
-                {currentPage > 4 && (
-                  <span className="px-2 py-2 text-sm text-gray-500">...</span>
-                )}
-              </>
-            )}
-
-            {getVisiblePageNumbers().map((pageNumber) => (
-              <button
-                key={pageNumber}
-                onClick={() => goToPage(pageNumber)}
-                className={`px-3 py-2 rounded-md border text-sm font-medium ${pageNumber === currentPage
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                {pageNumber}
-              </button>
-            ))}
-
-            {currentPage < totalPages - 2 && (
-              <>
-                {currentPage < totalPages - 3 && (
-                  <span className="px-2 py-2 text-sm text-gray-500">...</span>
-                )}
-                <button
-                  onClick={() => goToPage(totalPages)}
-                  className="px-3 py-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50"
-                >
-                  {totalPages}
-                </button>
-              </>
-            )}
-
-            <button
-              onClick={goToNextPage}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Próxima página"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={goToLastPage}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded-md border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Última página"
-            >
-              <ChevronsRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        itemsPerPage={itemsPerPage}
+        totalItems={cancelamentosFiltrados?.length ?? 0}
+        startIndex={startIndex}
+        getVisiblePageNumbers={getVisiblePageNumbers}
+        goToFirstPage={goToFirstPage}
+        goToPreviousPage={goToPreviousPage}
+        goToPage={goToPage}
+        goToNextPage={goToNextPage}
+        goToLastPage={goToLastPage}
+      />
     </div>
   );
 }

@@ -26,6 +26,8 @@ export function usePlanilha({ aba }: PlanilhaResponse) {
             const sheet = workbook.Sheets[aba];
             const dados = XLSX.utils.sheet_to_json<CancelamentoItem>(sheet, {
                 defval: "", raw: false,
+            }).filter((row) => {
+                return row.motivoCancelamento?.trim() !== "";
             });
             return dados;
         },

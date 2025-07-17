@@ -205,6 +205,7 @@ export interface RetentionProps {
   setor: string;
   quantidade: number;
   porcentagem: number;
+  dataCancelamento?: string;
   colaboradores: Colaboradores[];
 }
 
@@ -301,6 +302,9 @@ export const newSearchRetention = z.object({
   clientName: z.string().optional(),
   neighborhood: z.string().optional(),
   reason: z.string().optional(),
+  sector: z.string().optional(),
+  plan: z.string().optional(),
+  condominium: z.string().optional(),
   dateRange: z
     .object({
       from: z.date().optional(),
@@ -355,6 +359,34 @@ export const motivosCancelamentos = [
   "Insatisfação com Streaming",
 ];
 
+export const motivosRetencoes = [
+  "Isenção de uma mensalidade",
+  "Upgrade de plano, 3 meses da mensalidade atual",
+  "Desconto por 3 meses",
+  "Desconto por 6 meses",
+  "Desconto por 1 ano",
+  "Troca de titularidade concluída",
+  "Downgrade do plano",
+  "Encaixe de ordem de serviço",
+  "Diálogo e retratação",
+  "Upgrade do plano",
+  "Diálogo com ênfase em nossa qualidade",
+  "Upgrade de plano e troca de equipamento",
+  "Realizado suporte remoto",
+  "Mediante visita técnica",
+  "Implantação novo endereço",
+  "Troca de equipamento",
+  "Desconto pontual, redução de 1 mensalidade",
+  "Postergado data de vencimento",
+  "Redução taxa de serviço",
+  "Isenção taxa de serviço",
+  "Apenas retirado juros da mensalidade",
+  "Proposta Black Friday",
+  "Cancelou e reativou no mesmo mês",
+  "Retenção - Reativou após pausa no"
+]
+
+
 export type CancelamentoItem = {
   idCliente?: string | number;
   nome?: string;
@@ -374,7 +406,7 @@ export type RetencoesItem = {
   idContrato?: string | number;
   idAtendimento?: string | number;
   motivoCancelamento: string;
-  plano:string;
+  plano: string;
   retencaoAplicada: string;
   responsavel: string;
   [key: string]: any;
@@ -431,3 +463,102 @@ export type CustomTooltipProps = {
 export type CustomLegend = {
   payload?: { value: string; color: string; payload: RetentionProps }[];
 }
+
+export const allPlans = [
+  "COMBO MULTI 30 PROMOCIONAL",
+  "COMBO MULTI 250 + BASIC TV",
+  "COMBO MULTI 250 + POWER TV",
+  "COMBO MULTI 300 PROMOCIONAL",
+  "COMBO MULTI 500 + BASIC TV",
+  "COMBO MULTI 500 PROMOCIONAL",
+  "MULTI 50",
+  "COMBO MULTI 50 PROMOCIONAL",
+  "COMBO MULTI PREMIUM",
+  "COMBO MULTI 500",
+  "COMBO MULTI 150 PROMOCIONAL",
+  "MULTI 150 EMPRESA",
+  "MULTI 300 EMPRESA",
+  "MULTI 500 EMPRESA",
+  "CORPORATIVO MULTI 100",
+  "CORPORATIVO MULTI 250",
+  "CORPORATIVO MULTI 500",
+  "MULTI 200",
+  "MULTI 100",
+
+]
+
+export const condominios = [
+
+
+  "Condominio Evidence",
+  "Condominio Nova Zelandia I",
+  "Condominio Terra Nobre Granja Vianna",
+  "Condominio Vila Real do Moinho Velho",
+  "Condomínio Andorinhas - Reserva das Aves",
+  "Condomínio Araras",
+  "Condomínio Arco Iris I",
+  "Condomínio Associação Residencial dos Ipês",
+  "Condomínio Astoria III",
+  "Condomínio Beija Flor - Reserva das Aves",
+  "Condomínio Bem-te-vi (Lageado)",
+  "Condomínio Bosque Clube ",
+  "Condomínio Buona Vitta",
+  "Condomínio Canários - Reserva das Aves",
+  "Condomínio Club & Home Bosque dos Pássaros",
+  "Condomínio Conquista Cotia",
+  "Condomínio Costa Verde",
+  "Condomínio Cotia C (CDHU do Panorama)",
+  "Condomínio Green Land",
+  "Condomínio Jardim dos Alpes",
+  "Condomínio Juritis - Reserva das Aves",
+  "Condomínio Le Mont I",
+  "Condomínio Le Mont II",
+  "Condomínio Nova Zelândia II",
+  "Condomínio Novo Horizonte",
+  "Condomínio Parque Real",
+  "Condomínio Portal de Cotia",
+  "Condomínio Refúgio Cantagalo III",
+  "Condomínio Reserva Samambaia",
+  "Condomínio Residencial Bento XXI",
+  "Condomínio Residencial Florença",
+  "Condomínio Residencial Valle Verde",
+  "Condomínio Residencial Viva Vida",
+  "Condomínio Residêncial Porto Seguro",
+  "Condomínio Residêncial Praça Paraíso",
+  "Condomínio Residêncial Vila Verde",
+  "Condomínio Sindona Parque 01",
+  "Condomínio Tangará",
+  "Condomínio Veredas (CDHU do São Miguel)",
+  "Condomínio Vida Plena",
+  "Condomínio Villa Residêncial do Bosque",
+  "Condomínio Vista Verde",
+  "Condomínio Vitoria",
+  "Edifício Narciso",
+  "Edifício Pedra Diamante",
+  "Edifício Pedra Zafira",
+  "Edifício São Sebastião",
+  "Parque Industrial San José",
+  "Parque Vivere Cotia",
+  "Residencial Barcelona",
+  "Residencial Bem-te-vi",
+  "Residencial Cellebra Cotia",
+  "Residencial Granja Caiapia",
+  "Residencial Ilha de Capri",
+  "Residencial Las Vegas",
+  "Residencial Mônaco",
+  "Residencial Napoles",
+  "Residencial Nativo Clube",
+  "Residencial Paris",
+  "Residencial Positano",
+  "Residencial Quinta de Santa Ana",
+  "Residencial Sidney",
+  "Residencial Vida Nova",
+  "Residencial Villa D'Este",
+  "Shopping Granja Vianna",
+  "Shopping Open Mall The Square",
+  "Vila das Flores",
+  "Villagio di Lux"
+]
+
+
+
