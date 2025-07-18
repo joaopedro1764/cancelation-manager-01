@@ -37,7 +37,7 @@ export function Pagination({
     return (
         <div className="flex items-center justify-between mt-4 px-2">
             <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">
+                <span className="text-sm font-bold text-gray-600">
                     Mostrando {startIndex + 1} a{" "}
                     {Math.min(startIndex + itemsPerPage, totalItems)} de {totalItems} resultados
                 </span>

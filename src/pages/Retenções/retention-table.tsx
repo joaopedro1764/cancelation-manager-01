@@ -10,30 +10,71 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { usePlanilha } from "@/api/planilha";
 import { Pagination } from "@/components/Pagination";
+import { format, isValid, isWithinInterval, parse } from "date-fns";
 
 export function RetentionTable() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [searchParams] = useSearchParams();
-  const clientNameParam = searchParams.get("clientName");
-  const userIdParam = searchParams.get("userId");
-  const reasonParam = searchParams.get("reason");
-  const sectorParam = searchParams.get("sector");
+
+
+  const filters = {
+    userId: searchParams.get("userId")?.toLowerCase().trim(),
+    contractId: searchParams.get("contractId")?.toLowerCase().trim(),
+    attendanceId: searchParams.get("attendanceId")?.toLowerCase().trim(),
+    clientName: searchParams.get("clientName")?.toLowerCase().trim(),
+    dateFrom: searchParams.get("dateFrom"),
+    dateTo: searchParams.get("dateTo"),
+    reason: searchParams.get("reason")?.toLowerCase().trim(),
+    month: searchParams.get("month")?.toLowerCase().trim(),
+    sector: searchParams.get("sector")?.toLowerCase().trim(),
+    colaborator: searchParams.get("colaborator")?.toLowerCase().trim(),
+    dificulty: searchParams.get("difficulty")?.toLowerCase().trim(),
+  };
+
+
+  const parsedFrom = filters.dateFrom ? parse(filters.dateFrom, "dd/MM/yyyy", new Date()) : null;
+  const parsedTo = filters.dateTo ? parse(filters.dateTo, "dd/MM/yyyy", new Date()) : null;
 
   const { data: retencoes, isLoading } = usePlanilha({ aba: "Retenções Outros Setores" });
 
   const retencoesFiltradas = retencoes?.filter((item) => {
-    if (!item.nome) return;
-    const nome = item.nome?.toLowerCase() ?? "";
+    if (!item.nome) return false;
+
+    const nome = item.nome.toLowerCase();
     const idCliente = String(item.idCliente ?? "").toLowerCase();
+    const contrato = String(item.idContrato ?? "").toLowerCase();
+    const atendimento = String(item.idAtendimento ?? "").toLowerCase();
     const motivo = item.motivoCancelamento?.toLowerCase() ?? "";
-    const sector = item.setor?.toLowerCase() ?? "";
+    const setor = item.setor?.toLowerCase() ?? "";
+    const colaborador = item.responsavel?.toLowerCase() ?? "";
+    const dificuldade = item.dificuldade?.toLowerCase() ?? "";
+    const mes = item.mesReferencia?.toLowerCase() ?? "";
+
+    console.log(filters.attendanceId)
+
+
+
+    const dataRegistro = item.dataRetencao && isValid(new Date(item.dataRetencao))
+      ? new Date(item.dataRetencao)
+      : null;
+
+    const isInDateRange = dataRegistro && parsedFrom && parsedTo
+      ? isWithinInterval(dataRegistro, { start: parsedFrom, end: parsedTo })
+      : true;
+
     return (
-      (!clientNameParam || nome.includes(clientNameParam.toLowerCase())) &&
-      (!userIdParam || idCliente.includes(userIdParam.toLowerCase())) &&
-      (!sectorParam || sector.includes(sectorParam.toLowerCase())) &&
-      (!reasonParam || motivo.includes(`retencao - ${reasonParam.toLowerCase()}`))
+      (!filters.userId || idCliente.includes(filters.userId)) &&
+      (!filters.clientName || nome.includes(filters.clientName)) &&
+      (!filters.contractId || contrato.includes(filters.contractId)) &&
+      (!filters.attendanceId || atendimento.includes(filters.attendanceId)) &&
+      (!filters.reason || motivo.includes(`retencao - ${filters.reason}`)) &&
+      (!filters.sector || setor.includes(filters.sector)) &&
+      (!filters.colaborator || colaborador.includes(filters.colaborator)) &&
+      (!filters.dificulty || dificuldade.includes(filters.dificulty)) &&
+      (!filters.month || mes.includes(filters.month)) &&
+      isInDateRange
     );
   });
 
@@ -65,7 +106,7 @@ export function RetentionTable() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [clientNameParam, userIdParam, reasonParam]);
+  }, [filters.clientName, filters.userId, filters.reason]);
 
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
@@ -73,14 +114,17 @@ export function RetentionTable() {
         <TableHeader className="sticky top-0 bg-gray-50 tracking-wide z-10 border-b border-gray-200 text-gray-700 text-sm">
           <TableRow className="bg-gray-50">
             <TableHead className="font-bold">ID cliente</TableHead>
+
             <TableHead className="font-bold">Cliente</TableHead>
             <TableHead className="font-bold">ID contrato</TableHead>
             <TableHead className="font-bold">ID atendimento</TableHead>
             <TableHead className="font-bold">Plano</TableHead>
             <TableHead className="font-bold">Motivo cancelamento</TableHead>
             <TableHead className="font-bold">Retenção aplicada</TableHead>
-            <TableHead className="font-bold">Responsável</TableHead>
             <TableHead className="font-bold">Setor</TableHead>
+            <TableHead className="font-bold">Data retenção</TableHead>
+            <TableHead className="font-bold">Responsável</TableHead>
+            <TableHead className="font-bold">Dificuldade</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="hover:cursor-pointer">
@@ -128,10 +172,16 @@ export function RetentionTable() {
                 >
                   {item.responsavel}
                 </TableCell>
+                <TableCell>{format(item.dataRetencao, "dd/MM/yyyy")}</TableCell>
                 <TableCell
                   className="whitespace-nowrap max-w-[140px] truncate"
                 >
                   {item.setor}
+                </TableCell>
+                <TableCell
+                  className="whitespace-nowrap max-w-[140px] truncate"
+                >
+                  {item.dificuldade}
                 </TableCell>
               </TableRow>
             ))

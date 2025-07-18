@@ -298,6 +298,9 @@ export function CancelationInPeriod() {
               <p className="text-sm text-gray-600 mt-1">
                 Insights detalhados sobre cancelamentos no período
               </p>
+              <span className="text-sm text-gray-600 border shadow-sm px-2 py-1.5 rounded">
+                Período filtrado: 
+              </span>
             </div>
             <DateRangePicker className="font-bold" date={dateRange} OnDateChange={setDateRange} />
           </div>

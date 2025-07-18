@@ -1,22 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Filter, Search, X } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
-import { months, motivosCancelamentos, newSearchRetention, setores } from "@/utils";
+import { useForm } from "react-hook-form";
+import { colaborators, difficultys, months, motivosRetencoes, SearchProps, sectors } from "@/utils";
 import { useState } from "react";
 import type { z } from "zod";
 import { useSearchParams } from "react-router-dom";
+import { SelectPopoverField } from "@/components/Select/SelectPopover";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import type { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
-export type NewSearchRetentionType = z.infer<typeof newSearchRetention>;
+export type NewSearchRetentionType = z.infer<typeof SearchProps>;
 
 export function RetentionFilter() {
+
+  const [dateRangeCalendar, setDateRangeCalendar] = useState<DateRange | undefined>({
+    from: new Date(2025, 4, 1),
+    to: new Date(2025, 4, 30),
+  });
 
   const [showFilters, setShowFilters] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,54 +27,53 @@ export function RetentionFilter() {
   const userId = searchParams.get("userId");
   const reason = searchParams.get("reason");
   const sector = searchParams.get("sector");
-  const { handleSubmit, register, control } = useForm<NewSearchRetentionType>({
+  const { handleSubmit, register, control, reset } = useForm<NewSearchRetentionType>({
     values: {
       clientName: clientName ?? "",
       userId: userId ?? "",
       reason: reason ?? "",
       sector: sector ?? "",
+       dateRange: {
+        from: dateRangeCalendar?.to,
+        to: dateRangeCalendar?.from,
+      }
     },
   });
 
-  function handleFilter({
-    clientName,
-    userId,
-    reason,
-    sector,
-  }: NewSearchRetentionType) {
+  function handleFilter(filters: NewSearchRetentionType) {
     setSearchParams((state) => {
-      if (userId) {
-        state.set("userId", userId);
-      } else {
-        state.delete("userId");
-      }
-      if (clientName) {
-        state.set("clientName", clientName);
-      } else {
-        state.delete("clientName");
-      }
-      if (reason) {
-        state.set("reason", reason);
-      } else {
-        state.delete("reason");
-      }
-      if (sector) {
-        state.set("sector", sector);
-      } else {
-        state.delete("sector");
-      }
+      console.log(filters)
+      Object.entries(filters).forEach(([key, value]) => {
+        console.log("oi")
+        if (key === "dateRange" && value && typeof value === "object") {
+          console.log("oi")
+          const { from, to } = value as { from?: Date; to?: Date };
+
+          if (from) {
+            state.set("dateFrom", format(from, "dd/MM/yyyy"));
+          } else {
+            state.delete("dateFrom");
+          }
+          if (to) {
+            state.set("dateTo", format(to, "dd/MM/yyyy"));
+          } else {
+            state.delete("dateTo");
+          }
+        } else if (value && typeof value === "string") {
+          console.log("oi")
+          state.set(key, value);
+        } else {
+          state.delete(key);
+        }
+      });
+
       return state;
     });
   }
 
-  const handleClearFilter = () => {
-    setSearchParams((state) => {
-      state.delete("userId");
-      state.delete("clientName");
-      state.delete("reason");
-      state.delete("sector");
-      return state;
-    });
+  function handleClearAllFilters() {
+    setSearchParams(new URLSearchParams());
+    reset()
   };
 
 
@@ -89,131 +90,106 @@ export function RetentionFilter() {
       </Button>
 
       {showFilters && (
-        <form
-          onSubmit={handleSubmit(handleFilter)}
-          className="flex items-center gap-2 mb-5"
-        >
-         
-          <Input
-            {...register("userId")}
-            className="h-8 w-[100px]"
-            placeholder="ID cliente"
-          />
-          <Input
-            {...register("clientName")}
-            className="h-8 w-[200px]"
-            placeholder="Nome cliente"
-          />
+        <div className="bg-muted/30 rounded-lg p-4 border duration-300 ease-in">
 
-          <Controller
-            name="reason"
-            control={control}
-            render={({ field: { onChange, value, disabled, name } }) => (
-              <Select
-                onValueChange={onChange}
-                disabled={disabled}
-                name={name}
-                value={value}
-              >
-                <SelectTrigger className="h-8 w-[250px]">
-                  <SelectValue placeholder="Selecione o mês" />
-                  <SelectContent className="h-[280px]">
-                    {months.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectTrigger>
-              </Select>
-            )}
-          />
+          <form onSubmit={handleSubmit(handleFilter)} className="space-y-3">
 
-          <Controller
-            name="sector"
-            control={control}
-            render={({ field: { onChange, value, disabled, name } }) => (
-              <Select
-                onValueChange={onChange}
-                disabled={disabled}
-                name={name}
-                value={value}
-              >
-                <SelectTrigger className="h-8 w-[250px]">
-                  <SelectValue placeholder="Selecione o setor" />
-                  <SelectContent>
-                    {setores.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectTrigger>
-              </Select>
-            )}
-          />
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <Input
+                {...register("userId")}
+                placeholder="ID do cliente"
+                aria-label="ID do cliente"
+                className=""
+              />
 
-          <Controller
-            name="reason"
-            control={control}
-            render={({ field: { onChange, value, disabled, name } }) => (
-              <Select
-                onValueChange={onChange}
-                disabled={disabled}
-                name={name}
-                value={value}
-              >
-                <SelectTrigger className="h-8 w-[250px]">
-                  <SelectValue placeholder="Selecione o motivo" />
-                  <SelectContent className="h-[280px]">
-                    {motivosCancelamentos.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectTrigger>
-              </Select>
-            )}
-          />
-           <Controller
-            name="reason"
-            control={control}
-            render={({ field: { onChange, value, disabled, name } }) => (
-              <Select
-                onValueChange={onChange}
-                disabled={disabled}
-                name={name}
-                value={value}
-              >
-                <SelectTrigger className="h-8 w-[250px]">
-                  <SelectValue placeholder="Selecione o colaborador" />
-                  <SelectContent className="h-[280px]">
-                    {motivosCancelamentos.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectTrigger>
-              </Select>
-            )}
-          />
-          <Button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-400 text-white"
-          >
-            <Search className="mr-2 h-4 w-4" /> Filtrar resultados
-          </Button>
-          <Button
-            onClick={handleClearFilter}
-            type="button"
-            variant="outline"
-            size="sm"
-          >
-            <X className="mr-2 h-4 w-4" /> Remover filtros
-          </Button>
-        </form>
+              <Input
+                {...register("contractId")}
+                placeholder="ID do contrato"
+                aria-label="ID do contrato"
+                className="h-8"
+              />
+
+              <Input
+                {...register("attendanceId")}
+                placeholder="ID do atendimento"
+                aria-label="ID do atendimento"
+                className="h-8"
+              />
+
+              <Input
+                {...register("clientName")}
+                placeholder="Nome do cliente"
+                aria-label="Nome do cliente"
+                className="h-8"
+              />
+
+              <DateRangePicker
+                {...register("dateRange")}
+                date={dateRangeCalendar}
+                OnDateChange={setDateRangeCalendar}
+                aria-label="Período"
+              />
+
+              <SelectPopoverField
+                name="reason"
+                control={control}
+                options={motivosRetencoes}
+                placeholder="Selecione o motivo"
+                emptyText="Nenhum motivo encontrado."
+                aria-label="Motivo"
+              />
+
+              <SelectPopoverField
+                name="month"
+                control={control}
+                options={months}
+                placeholder="Selecione o mês"
+                emptyText="Nenhum mês encontrado."
+                aria-label="Mês"
+              />
+
+              <SelectPopoverField
+                name="sector"
+                control={control}
+                options={sectors}
+                placeholder="Selecione o setor"
+                emptyText="Nenhum bairro encontrado."
+                aria-label="Setor"
+              />
+              <SelectPopoverField
+                name="colaborator"
+                control={control}
+                options={colaborators}
+                placeholder="Selecione o colaborador"
+                emptyText="Nenhum colaborador encontrado."
+                aria-label="Colaborador"
+              />
+              <SelectPopoverField
+                name="difficulty"
+                control={control}
+                options={difficultys}
+                placeholder="Selecione a dificuldade"
+                emptyText="Nenhum bairro encontrado."
+                aria-label="Dificuldade"
+              />
+              <div className="flex flex-1 gap-2 lg:col-span-1 max-w-[300px] w-full">
+                <Button type="submit" className="h-8 bg-blue-600 hover:bg-blue-700">
+                  <Search className="h-3 w-3 mr-1" />
+                  Filtrar
+                </Button>
+                <Button
+                  onClick={handleClearAllFilters}
+                  type="button"
+                  variant="outline"
+                  className="h-8 bg-transparent shadow-sm"
+                >
+                  Limpar
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          </form>
+        </div>
       )}
     </>
   );

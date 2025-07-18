@@ -28,13 +28,15 @@ export function CancelationTable() {
   const dateFromParam = searchParams.get("dateFrom");
   const dateToParam = searchParams.get("dateTo");
   const planParam = searchParams.get("plan");
-
+  const condominiumParam = searchParams.get("condominium")
+  
   const cancelamentosFiltrados = cancelamentos?.filter((item) => {
     const name = item.nome?.toLowerCase() ?? "";
     const idCliente = String(item.idCliente ?? "").toLowerCase();
     const reason = item.motivoReal?.toLowerCase() ?? "";
     const neighborhood = item.bairro?.toLowerCase() ?? "";
     const plan = item.plano?.toLowerCase() ?? "";
+    const condominium = item.condominio?.toLowerCase() ?? ""
     const parsedDate = item.dataCancelamento && isValid(new Date(item.dataCancelamento))
       ? new Date(item.dataCancelamento)
       : null;
@@ -52,6 +54,7 @@ export function CancelationTable() {
       (!userIdParam || idCliente.includes(userIdParam.trim().toLowerCase())) &&
       (!planParam || plan.includes(planParam.trim().toLowerCase())) &&
       (!reasonParam || reason.includes(reasonParam.toLowerCase())) &&
+      (!condominiumParam || condominium.includes(condominiumParam.toLowerCase())) &&
       isInDateRange
     );
   });
@@ -131,7 +134,7 @@ export function CancelationTable() {
             <TableHead className="font-bold">Motivo real</TableHead>
             <TableHead className="font-bold">Data cancelamento</TableHead>
             <TableHead className="font-bold">Bairro</TableHead>
-            <TableHead className="font-bold">Condominio</TableHead>
+            <TableHead className="font-bold">Condomínio</TableHead>
             <TableHead className="font-bold">Tempo ativo</TableHead>
             <TableHead className="font-bold">Ações</TableHead>
           </TableRow>
@@ -173,7 +176,7 @@ export function CancelationTable() {
                   )}
                 </TableCell>
                 <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
-                  <span className="inline-flex items-center font-semibold px-3 py-1 rounded-full text-sm bg-blue-100 text-gray-500">
+                  <span className="inline-flex items-center font-medium px-3 py-1 rounded-full text-sm shadow-sm bg-gray-200 text-gray-800">
 
                     {item.dataCancelamento ? (
                       isValid(new Date(item.dataCancelamento)) ? (
@@ -194,7 +197,7 @@ export function CancelationTable() {
                 </TableCell>
                 <TableCell>
                   {item.tempoAtivo && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full max-w-[120px] truncate whitespace-nowrap overflow-hidden">
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 shadow-sm text-xs rounded-full max-w-[120px] truncate whitespace-nowrap overflow-hidden">
                       {item.tempoAtivo}
                     </span>
                   )}
