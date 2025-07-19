@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { format, isValid, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Info, Calendar, TrendingUp, AlertTriangle } from "lucide-react";
+import { TrendingUp, AlertTriangle, RefreshCcw } from "lucide-react";
 import { usePlanilha } from "@/api/planilha";
 import { DateRangePicker } from "../../ui/date-range-picker";
 import { CancelationInPeriodSkeleton } from "./cancelation-in-period-skeleton";
@@ -90,9 +90,6 @@ const ItemGrafico = ({
           <span className="text-sm font-medium text-gray-700 truncate" title={item.motivo}>
             {item.motivo}
           </span>
-          <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600 whitespace-nowrap">
-            {item.setor}
-          </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm font-semibold text-gray-900">
@@ -174,9 +171,7 @@ export function CancelationInPeriod() {
     const total = filtrados.length;
     const mesAtual = format(new Date(), "MMMM/yyyy", { locale: ptBR });
 
-    console.log(contagemMap)
-
-    const resultadoPrincipal = Array.from(contagemMap.entries())
+       const resultadoPrincipal = Array.from(contagemMap.entries())
       .map(([_, { motivo, motivoInsatisfacao, quantidade, datas }], index) => ({
         id: String(index + 1),
         motivo,
@@ -243,22 +238,33 @@ export function CancelationInPeriod() {
 
   const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
 
-    const totalCancelamentos = dados.reduce((sum, item) => sum + item.quantidade, 0);
+     const totalCancelamentos = dados.reduce((sum, item) => sum + item.quantidade, 0);
     const principalMotivo = dados.length > 0 ? dados[0] : null;
 
     return (
+      <>
+      <span className=""> {totalCancelamentos}</span>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 transition-all hover:shadow-md">
+       
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 transition-all">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-5 w-5 text-blue-600 flex-shrink-0" />
-            <span className="text-sm font-medium text-blue-900">Total no Período</span>
+            <RefreshCcw className="h-5 w-5 text-blue-600 flex-shrink-0" />
+            <span className="text-sm font-medium text-blue-900">Troca de provedor</span>
           </div>
-          <p className="text-2xl font-bold text-blue-900">
-            {totalCancelamentos.toLocaleString('pt-BR')}
+          <div className="space-y-3">
+          <p className="font-bold text-blue-900 leading-tight">
+           Vivo:80
           </p>
+          <p className="font-bold text-blue-900 leading-tight">
+           Claro:10
+          </p>
+          <p className="font-bold text-blue-900 leading-tight">
+           Não quis informar: 20
+          </p>
+          </div>
         </div>
 
-        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 transition-all hover:shadow-md">
+        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 transition-all">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="h-5 w-5 text-orange-600 flex-shrink-0" />
             <span className="text-sm font-medium text-orange-900">Principal Motivo</span>
@@ -278,7 +284,7 @@ export function CancelationInPeriod() {
 
         </div>
 
-        <div className="bg-red-50 p-4 rounded-lg border border-red-200 transition-all hover:shadow-md sm:col-span-2 lg:col-span-1">
+        <div className="bg-red-50 p-4 rounded-lg border border-red-200 transition-all sm:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
             <span className="text-sm font-medium text-red-900">Motivos insatisfação:</span>
@@ -292,6 +298,7 @@ export function CancelationInPeriod() {
           </div>
         </div>
       </div>
+      </>
     );
   };
 
@@ -307,7 +314,7 @@ export function CancelationInPeriod() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Análise de Cancelamentos
+                Análise de Cancelamentos: {maxValue}
               </h2>
               <p className="text-sm text-gray-600 mb-7">
                 Visualize os principais dados e motivos dos cancelamentos ocorridos no período selecionado.

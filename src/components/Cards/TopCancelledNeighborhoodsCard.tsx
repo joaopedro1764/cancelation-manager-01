@@ -17,10 +17,10 @@ export function TopCancelledNeighborhoodsCard() {
 
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-blue-500 hover:-translate-y-3 duration-700 ease-in-out">
+        <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
             <div className="flex items-center justify-between mb-4">
                 <div>
-                    <p className="text-lg font-semibold text-gray-900">Bairros Mais Cancelados</p>
+                    <p className="text-lg font-bold text-blue-700">Bairros Mais Cancelados</p>
                     <p className="text-sm text-gray-600">Mês de Maio</p>
                 </div>
                 <MapPin className="h-8 w-8 text-blue-500" />
@@ -29,7 +29,7 @@ export function TopCancelledNeighborhoodsCard() {
                 {
                     top4Bairros.map(([bairro, quantidade]) => (
                         <div key={bairro} className="flex justify-between items-center">
-                            <span className="text-sm font-medium text-gray-700">{bairro}</span>
+                            <span className="text-sm font-bold text-gray-700">{bairro}</span>
                             <span className="text-sm font-bold">{quantidade} cancelamentos</span>
                         </div>
                     ))

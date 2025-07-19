@@ -60,6 +60,8 @@ export function RetentionTable() {
     const isInDateRange = dataRegistro && parsedFrom && parsedTo
       ? isWithinInterval(dataRegistro, { start: parsedFrom, end: parsedTo })
       : true;
+  
+      console.log(filters.reason)
 
     return (
       (!filters.userId || idCliente.includes(filters.userId)) &&

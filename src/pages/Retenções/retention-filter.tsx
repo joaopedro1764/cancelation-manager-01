@@ -42,13 +42,9 @@ export function RetentionFilter() {
 
   function handleFilter(filters: NewSearchRetentionType) {
     setSearchParams((state) => {
-      console.log(filters)
       Object.entries(filters).forEach(([key, value]) => {
-        console.log("oi")
         if (key === "dateRange" && value && typeof value === "object") {
-          console.log("oi")
           const { from, to } = value as { from?: Date; to?: Date };
-
           if (from) {
             state.set("dateFrom", format(from, "dd/MM/yyyy"));
           } else {
@@ -60,7 +56,6 @@ export function RetentionFilter() {
             state.delete("dateTo");
           }
         } else if (value && typeof value === "string") {
-          console.log("oi")
           state.set(key, value);
         } else {
           state.delete(key);
@@ -94,7 +89,7 @@ export function RetentionFilter() {
 
           <form onSubmit={handleSubmit(handleFilter)} className="space-y-3">
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               <Input
                 {...register("userId")}
                 placeholder="ID do cliente"
@@ -181,9 +176,9 @@ export function RetentionFilter() {
                   onClick={handleClearAllFilters}
                   type="button"
                   variant="outline"
-                  className="h-8 bg-transparent shadow-sm"
+                  className="h-8 w-auto bg-transparent shadow-sm"
                 >
-                  Limpar
+                
                   <X className="h-3 w-3" />
                 </Button>
               </div>

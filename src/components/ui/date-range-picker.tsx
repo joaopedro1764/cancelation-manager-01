@@ -26,7 +26,7 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-auto justify-start text-left font-normal",
+              "w-full justify-start text-left font-normal",
               !date && "text-muted-foreground",
             )}
           >
@@ -34,8 +34,8 @@ export function DateRangePicker({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "dd 'de' LLLL 'de' yyyy", { locale: ptBR })} até{" "}
-                  {format(date.to, "dd 'de' LLLL 'de' yyyy", { locale: ptBR })}
+                  {format(date.from, "dd'/'MM'/'yyyy", { locale: ptBR })} -{" "}
+                  {format(date.to, "dd'/'MM'/'yyyy", { locale: ptBR })}
                 </>
               ) : (
                 format(date.from, "dd 'de' LLLL 'de' yyyy", { locale: ptBR })

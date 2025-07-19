@@ -6,7 +6,7 @@ export function CancelationMonthsCard() {
 
   const { data: cancelamentos } = usePlanilha({ aba: "ClientesMaio2025" })
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:-translate-y-3 duration-500 ease-in-out">
+    <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">Cancelamentos (mês)</p>

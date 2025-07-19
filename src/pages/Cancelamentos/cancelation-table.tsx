@@ -216,14 +216,10 @@ console.log(openModalDetails)
                 </TableCell>
               </TableRow>
             ))
-
           )}
         </TableBody>
-
       </Table>
-
-
-      <Pagination
+     <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         itemsPerPage={itemsPerPage}

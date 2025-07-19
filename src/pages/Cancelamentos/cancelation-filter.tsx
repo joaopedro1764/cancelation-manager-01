@@ -139,7 +139,7 @@ export function CancelationFilter() {
                   variant="outline"
                   className="h-8 bg-transparent shadow-sm"
                 >
-                  Limpar
+                  
                   <X className="h-3 w-3" />
                 </Button>
               </div>

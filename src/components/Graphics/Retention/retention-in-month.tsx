@@ -1,18 +1,16 @@
 import React, { useState, type JSX } from 'react';
 import { TrendingUp, Users, Target, DollarSign, Wrench, Headphones, Shield } from 'lucide-react';
-import { DialogContent, Dialog, DialogHeader, DialogTitle, DialogDescription } from "../../ui/dialog"
-import { Input } from '../..//ui/input';
 import type { RetentionProps } from '@/utils';
 import { usePlanilha } from '@/api/planilha';
+import { ColaboradoresRetencaoModal } from './ColaboradoresRetencaoModal';
 
 export function RetentionInMonth() {
   const { data: retencoes } = usePlanilha({ aba: "Retenções Outros Setores" });
 
   const [hoveredSetor, setHoveredSetor] = useState<string | null>(null);
   const [selectedSetor, setSelectedSetor] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
+  const [openModalRetencao, setOpenModalRetencao] = useState(false);
   const [selectedItem, setSelectedItem] = useState<RetentionProps>();
-  const [search, setSearch] = useState("");
 
   // Calcular total corretamente - assumindo que cada item representa uma retenção
   const total = retencoes?.length || 0;
@@ -20,12 +18,12 @@ export function RetentionInMonth() {
   const handleClick = (entry: RetentionProps) => {
     setSelectedSetor(entry.setor);
     setSelectedItem(entry);
-    setOpen(true);
+    setOpenModalRetencao(true);
   };
 
 
   const contagemRetencoesPorSetor = retencoes?.reduce((acc, item) => {
-    const setor = item.setor || "Desconhecido";
+    const setor = item.setor || "";
 
     if (!acc[setor]) {
       acc[setor] = {
@@ -33,7 +31,7 @@ export function RetentionInMonth() {
         colaboradores: new Map(),
         itemOriginal: {
           ...item,
-          setor: item.setor || "Desconhecido",
+          setor: item.setor || "",
           quantidade: 1,
           porcentagem: 0,
           colaboradores: []
@@ -116,7 +114,7 @@ export function RetentionInMonth() {
   const percentualMaiorSetor = total > 0 ? (setorComMaisRetencoes.quantidade / total) * 100 : 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 w-[40%]">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -124,7 +122,7 @@ export function RetentionInMonth() {
             <Target className="h-6 w-6 text-green-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Retenções por Setor no mês</h2>
+            <h2 className="text-sm font-semibold text-gray-900">Retenções por Setor no mês de Maio</h2>
             <p className="text-sm text-gray-600">Total: {total} retenções</p>
           </div>
         </div>
@@ -136,7 +134,7 @@ export function RetentionInMonth() {
 
       <div className="grid grid-cols-1">
         <div className="space-y-3">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Retenções por setor</h3>
+          <h3 className="text-lg font-bold text-yellow-600 mb-4">Retenções por setor</h3>
 
           {contagemRetencoesPorSetor &&
             Object.entries(contagemRetencoesPorSetor)
@@ -180,61 +178,7 @@ export function RetentionInMonth() {
         </div>
       </div>
 
-      <Dialog
-        open={open}
-        onOpenChange={(isOpen) => {
-          setOpen(isOpen);
-          if (!isOpen) {
-            setSelectedSetor("");
-          }
-        }}
-      >
-        <DialogContent className="max-h-[600px] overflow-auto p-4">
-          <DialogHeader>
-            <DialogTitle className="text-lg">
-              <strong>Informações de Retenção</strong>
-            </DialogTitle>
-            <DialogDescription>
-              Setor: <strong className="text-blue-600">{selectedItem?.setor}</strong>
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-4">
-            <Input
-              placeholder="Buscar colaborador..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-3 mt-4 text-sm">
-            {selectedItem?.colaboradores
-              ?.filter((item) =>
-                item.nome.toLowerCase().includes(search.toLowerCase())
-              )
-              .sort((a, b) => b.quantidade - a.quantidade)
-              .map((item, index) => (
-                <div key={index} className="p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-800">{item.nome}</p>
-                      <p className="text-sm text-gray-600">
-                        {item.quantidade} retenç{item.quantidade === 1 ? 'ão' : 'ões'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-semibold text-sm">
-                          {item.quantidade}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ColaboradoresRetencaoModal setSelectedSetor={setSelectedSetor} setOpen={setOpenModalRetencao} selectedItem={selectedItem ?? null} open={openModalRetencao} />
     </div>
   );
 }

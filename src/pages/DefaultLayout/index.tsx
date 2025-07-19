@@ -36,7 +36,7 @@ export function DefaultLayout() {
       />
 
       <main 
-        className={`w-full flex-col flex-1 overflow-auto bg-gray-50 scroll-smooth h-full p-10 transition-all duration-300 ease-out ${getMainMargin()}`}
+        className={`w-full flex-col flex-1 overflow-auto bg-blue-50 scroll-smooth h-full p-10 transition-all duration-300 ease-out ${getMainMargin()}`}
       >
         <Outlet />
       </main>
