@@ -12,6 +12,7 @@ import { usePlanilha } from "@/api/planilha";
 import { Pagination } from "@/components/Pagination";
 import { format, isValid, isWithinInterval, parse } from "date-fns";
 
+
 export function RetentionTable() {
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,10 +52,6 @@ export function RetentionTable() {
     const colaborador = item.responsavel?.toLowerCase() ?? "";
     const dificuldade = item.dificuldade?.toLowerCase() ?? "";
     const mes = item.mesReferencia?.toLowerCase() ?? "";
-
-    console.log(filters.attendanceId)
-
-
 
     const dataRegistro = item.dataRetencao && isValid(new Date(item.dataRetencao))
       ? new Date(item.dataRetencao)
@@ -107,6 +104,20 @@ export function RetentionTable() {
   useEffect(() => {
     setCurrentPage(1);
   }, [filters.clientName, filters.userId, filters.reason]);
+
+  const motivoCores = {
+    "Baixa": "bg-green-500",
+    "Normal": "bg-yellow-500",
+    "Alta": "bg-orange-500",
+    "Crítica": "bg-red-500"
+  } as const;
+
+  type Motivo = keyof typeof motivoCores;
+
+  const getMotivoColor = (motivo: string) => {
+    return motivoCores[motivo as Motivo] || "bg-gray-100 text-gray-800";
+  };
+
 
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
@@ -172,7 +183,11 @@ export function RetentionTable() {
                 >
                   {item.responsavel}
                 </TableCell>
-                <TableCell>{format(item.dataRetencao, "dd/MM/yyyy")}</TableCell>
+                <TableCell className="max-w-[180px] truncate whitespace-nowrap overflow-hidden">
+                  <span className="inline-flex items-center font-medium px-3 py-1 rounded-full text-sm shadow-sm bg-gray-200 text-gray-800">
+                    {format(item.dataRetencao, "dd/MM/yyyy")}
+                  </span>
+                </TableCell>
                 <TableCell
                   className="whitespace-nowrap max-w-[140px] truncate"
                 >
@@ -181,7 +196,7 @@ export function RetentionTable() {
                 <TableCell
                   className="whitespace-nowrap max-w-[140px] truncate"
                 >
-                  {item.dificuldade}
+                  <span className={`${getMotivoColor(item.dificuldade)} text-white font-medium rounded-full px-2 py-1`}>{item.dificuldade}</span> 
                 </TableCell>
               </TableRow>
             ))
@@ -203,6 +218,8 @@ export function RetentionTable() {
         goToNextPage={goToNextPage}
         goToLastPage={goToLastPage}
       />
+
+   
     </div>
   );
 }

@@ -31,6 +31,29 @@ export interface RetentionProps {
   colaboradores: Colaboradores[];
 }
 
+export interface CancelamentoData {
+  dataAtivacao: string;             // Ex: "15/07/2020" (pode ser Date se você converter)
+  dataCancelamento: string;         // Ex: "26/05/2025"
+  tempoAtivo: string;               // Ex: "4 Anos, 10 Meses e 14 Dias"
+  Dias: number;                     // Total de dias como número
+  idCliente: string;
+  idContrato: string;
+  idAtendimento: string;
+  plano: string;
+  nome: string;
+  sexo: "Masculino" | "Feminino" | string;
+  rua: string;
+  bairro: string;
+  condominio?: string;
+  motivoReal: string;
+  localInviabilidade?: string;
+  motivoInsatisfacao?: string;
+  dificuldade?: string;
+  ajustadoNoIXC?: string;
+  responsavel?: string;
+  quantidade?: number; // usado para agrupamentos (ex: total por motivo)
+}
+
 export const SearchProps = z.object({
   userId: z.string().optional(),
   contractId: z.string().optional(),

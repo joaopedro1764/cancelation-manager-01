@@ -10,6 +10,7 @@ import type { DateRange } from "react-day-picker";
 interface CancelamentoData {
   id: string;
   motivo: string;
+  motivoInsatisfacao: string;
   quantidade: number;
   porcentagem: number;
   setor: string;
@@ -68,46 +69,7 @@ const formatarData = (rawDate: string): Date | null => {
   return isValid(data) ? data : null;
 };
 
-const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
-  const totalCancelamentos = dados.reduce((sum, item) => sum + item.quantidade, 0);
-  const principalMotivo = dados.length > 0 ? dados[0] : null;
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 transition-all hover:shadow-md">
-        <div className="flex items-center gap-2 mb-2">
-          <Calendar className="h-5 w-5 text-blue-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-blue-900">Total no Período</span>
-        </div>
-        <p className="text-2xl font-bold text-blue-900">
-          {totalCancelamentos.toLocaleString('pt-BR')}
-        </p>
-      </div>
-
-      <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 transition-all hover:shadow-md">
-        <div className="flex items-center gap-2 mb-2">
-          <TrendingUp className="h-5 w-5 text-orange-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-orange-900">Principal Motivo</span>
-        </div>
-        <p className="text-sm font-bold text-orange-900 leading-tight" title={principalMotivo?.motivo}>
-          {principalMotivo?.motivo && principalMotivo.motivo.length > 25
-            ? `${principalMotivo.motivo.substring(0, 25)}...`
-            : principalMotivo?.motivo || "N/A"}
-        </p>
-      </div>
-
-      <div className="bg-red-50 p-4 rounded-lg border border-red-200 transition-all hover:shadow-md sm:col-span-2 lg:col-span-1">
-        <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-red-900">Motivos Únicos</span>
-        </div>
-        <p className="text-2xl font-bold text-red-900">
-          {dados.length}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 const ItemGrafico = ({
   item,
@@ -162,66 +124,6 @@ const ItemGrafico = ({
   );
 };
 
-const InsightsAutomaticos = ({ dados }: { dados: CancelamentoData[] }) => {
-  const principalMotivo = dados.length > 0 ? dados[0] : null;
-  const motivosTecnicos = dados.filter(item => item.setor === "Técnico");
-  const totalTecnicos = motivosTecnicos.reduce((sum, item) => sum + item.quantidade, 0);
-  const totalGeral = dados.reduce((sum, item) => sum + item.quantidade, 0);
-
-  const insights = [];
-
-  if (principalMotivo && principalMotivo.porcentagem > 30) {
-    insights.push({
-      tipo: "alerta",
-      titulo: "Alto Índice de Cancelamento",
-      descricao: `${principalMotivo.motivo} representa ${principalMotivo.porcentagem}% dos cancelamentos.`,
-      acao: "Revisar processo relacionado a este motivo."
-    });
-  }
-
-  if (totalTecnicos > 0 && (totalTecnicos / totalGeral) > 0.4) {
-    insights.push({
-      tipo: "tecnico",
-      titulo: "Problemas Técnicos Recorrentes",
-      descricao: `${Math.round((totalTecnicos / totalGeral) * 100)}% dos cancelamentos são por motivos técnicos.`,
-      acao: "Considerar melhorias na infraestrutura técnica."
-    });
-  }
-
-  return (
-    <div className="space-y-4">
-      {insights.map((insight, index) => (
-        <div
-          key={index}
-          className={`p-4 rounded-lg border transition-all hover:shadow-md ${insight.tipo === "alerta"
-            ? "bg-yellow-50 border-yellow-200 hover:bg-yellow-100"
-            : "bg-blue-50 border-blue-200 hover:bg-blue-100"
-            }`}
-        >
-          <div className="flex items-start gap-3">
-            <Info className={`h-5 w-5 mt-0.5 flex-shrink-0 ${insight.tipo === "alerta" ? "text-yellow-600" : "text-blue-600"
-              }`} />
-            <div className="min-w-0 flex-1">
-              <p className={`text-sm font-medium ${insight.tipo === "alerta" ? "text-yellow-800" : "text-blue-800"
-                }`}>
-                {insight.titulo}
-              </p>
-              <p className={`text-sm mt-1 ${insight.tipo === "alerta" ? "text-yellow-700" : "text-blue-700"
-                }`}>
-                {insight.descricao}
-              </p>
-              <p className={`text-xs mt-2 font-medium ${insight.tipo === "alerta" ? "text-yellow-600" : "text-blue-600"
-                }`}>
-                💡 {insight.acao}
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 export function CancelationInPeriod() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2025, 4, 1),
@@ -230,48 +132,55 @@ export function CancelationInPeriod() {
 
   const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" })
 
-  const cancelamentosProcessados = useMemo(() => {
-    if (!cancelamentos || !Array.isArray(cancelamentos)) return [];
+  const { resumo: cancelamentosProcessados, bairrosInviabilidade, motivosInsatisfacao } = useMemo(() => {
+    if (!cancelamentos || !Array.isArray(cancelamentos)) return { resumo: [], bairrosInviabilidade: [], motivosInsatisfacao: [] };
 
     const { from, to } = dateRange || {};
 
-    // Filtrar por data
     const filtrados = cancelamentos.filter((item) => {
       const data = formatarData(item.dataCancelamento);
       if (!data) return false;
-
       if (from && data < from) return false;
       if (to && data > to) return false;
-
       return true;
     });
 
-    // Agrupar por motivo
     const contagemMap = new Map();
 
     filtrados.forEach((item) => {
       const motivo = item.motivoReal?.trim() || "Motivo não informado";
+      const motivoInsatisfacao = item.motivoInsatisfacao?.trim() || "";
+      const localInviabilidade = item.localInviabilidade;
       const data = formatarData(item.dataCancelamento);
-
       if (!data) return;
 
-      const entry = contagemMap.get(motivo);
+      const chave = `${motivo}`;
+
+      const entry = contagemMap.get(chave);
       if (entry) {
         entry.quantidade += 1;
         entry.datas.push(data);
       } else {
-        contagemMap.set(motivo, { quantidade: 1, datas: [data] });
+        contagemMap.set(chave, {
+          motivo,
+          motivoInsatisfacao,
+          localInviabilidade,
+          quantidade: 1,
+          datas: [data],
+        });
       }
     });
 
-    // Converter para array e calcular percentuais
     const total = filtrados.length;
     const mesAtual = format(new Date(), "MMMM/yyyy", { locale: ptBR });
 
-    return Array.from(contagemMap.entries())
-      .map(([motivo, { quantidade, datas }], index) => ({
+    console.log(contagemMap)
+
+    const resultadoPrincipal = Array.from(contagemMap.entries())
+      .map(([_, { motivo, motivoInsatisfacao, quantidade, datas }], index) => ({
         id: String(index + 1),
         motivo,
+        motivoInsatisfacao,
         quantidade,
         porcentagem: total > 0 ? Math.round((quantidade / total) * 100) : 0,
         setor: definirSetor(motivo),
@@ -279,7 +188,112 @@ export function CancelationInPeriod() {
         dataCancelamento: datas[0],
       }))
       .sort((a, b) => b.quantidade - a.quantidade);
+
+    // Bairros de mudança
+    const bairrosMap = new Map();
+    filtrados.forEach((item) => {
+      if (item.motivoReal?.trim() === "Mudanca de Endereco (Inviabilidade Tecnica)") {
+        const bairro = item.localInviabilidade?.trim() || "Bairro não informado";
+        const entry = bairrosMap.get(bairro);
+        if (entry) {
+          entry.quantidade += 1;
+        } else {
+          bairrosMap.set(bairro, { quantidade: 1 });
+        }
+      }
+    });
+    const bairrosInviabilidade = Array.from(bairrosMap.entries())
+      .map(([bairro, { quantidade }], index) => ({
+        id: String(index + 1),
+        bairro,
+        quantidade,
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
+
+    // Motivos de insatisfação
+    const insatisfacaoMap = new Map();
+    filtrados.forEach((item) => {
+      if (item.motivoReal?.trim() === "Insatisfacao com servico prestado") {
+        const motivo = item.motivoInsatisfacao?.trim() || "Motivo não informado";
+        const entry = insatisfacaoMap.get(motivo);
+        if (entry) {
+          entry.quantidade += 1;
+        } else {
+          insatisfacaoMap.set(motivo, { quantidade: 1 });
+        }
+      }
+    });
+    const motivosInsatisfacao = Array.from(insatisfacaoMap.entries())
+      .map(([motivoInsatisfacao, { quantidade }], index) => ({
+        id: String(index + 1),
+        motivoInsatisfacao,
+        quantidade,
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
+
+    return {
+      resumo: resultadoPrincipal,
+      bairrosInviabilidade,
+      motivosInsatisfacao,
+    };
   }, [cancelamentos, dateRange]);
+
+
+  console.log(cancelamentosProcessados)
+
+  const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
+
+    const totalCancelamentos = dados.reduce((sum, item) => sum + item.quantidade, 0);
+    const principalMotivo = dados.length > 0 ? dados[0] : null;
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 transition-all hover:shadow-md">
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="h-5 w-5 text-blue-600 flex-shrink-0" />
+            <span className="text-sm font-medium text-blue-900">Total no Período</span>
+          </div>
+          <p className="text-2xl font-bold text-blue-900">
+            {totalCancelamentos.toLocaleString('pt-BR')}
+          </p>
+        </div>
+
+        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 transition-all hover:shadow-md">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="h-5 w-5 text-orange-600 flex-shrink-0" />
+            <span className="text-sm font-medium text-orange-900">Principal Motivo</span>
+          </div>
+          <p className="text-sm font-bold text-orange-900 leading-tight" title={principalMotivo?.motivo}>
+            {principalMotivo?.motivo && principalMotivo.motivo.length > 25
+              ? `${principalMotivo.motivo}`
+              : principalMotivo?.motivo || "N/A"}
+            <div className="space-y-3 mt-2">
+              {
+                bairrosInviabilidade.slice(0, 3).map((item) => (
+                  <p>{item.bairro}: {item.quantidade}</p>
+                ))
+              }
+            </div>
+          </p>
+
+        </div>
+
+        <div className="bg-red-50 p-4 rounded-lg border border-red-200 transition-all hover:shadow-md sm:col-span-2 lg:col-span-1">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <span className="text-sm font-medium text-red-900">Motivos insatisfação:</span>
+          </div>
+          <div className="flex flex-col justify-between flex-1 space-y-3 font-bold text-red-900">
+            {
+              motivosInsatisfacao.slice(0, 3).map((item) => (
+                <p className="text-sm">{item.motivoInsatisfacao}: {item.quantidade}</p>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const maxValue = cancelamentosProcessados.length > 0
     ? Math.max(...cancelamentosProcessados.map(item => item.quantidade))
@@ -295,14 +309,18 @@ export function CancelationInPeriod() {
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Análise de Cancelamentos
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Insights detalhados sobre cancelamentos no período
+              <p className="text-sm text-gray-600 mb-7">
+                Visualize os principais dados e motivos dos cancelamentos ocorridos no período selecionado.
               </p>
-              <span className="text-sm text-gray-600 border shadow-sm px-2 py-1.5 rounded">
-                Período filtrado: 
+              <span className="text-sm mt-4 text-blue-600 font-bold border px-2 py-1.5 rounded">
+                Período selecionado: {""}
+                {dateRange?.from ? format(dateRange.from, "dd/MM/yyyy") : "N/A"} - {dateRange?.to ? format(dateRange.to, "dd/MM/yyyy") : "N/A"}
               </span>
             </div>
-            <DateRangePicker className="font-bold" date={dateRange} OnDateChange={setDateRange} />
+            <div>
+              <span className="text-sm font-bold text-blue-600">Filtrar período:</span>
+              <DateRangePicker className="font-bold" date={dateRange} OnDateChange={setDateRange} />
+            </div>
           </div>
         </div>
 
@@ -315,7 +333,10 @@ export function CancelationInPeriod() {
 
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Distribuição por Motivo
+                  Cancelamentos por assunto no
+                  Período filtrado: {""}
+                  <span className="text-blue-700 px-2 font-semibold py-1.5">{dateRange?.from ? format(dateRange.from, "dd/MM/yyyy") : "N/A"} - {dateRange?.to ? format(dateRange.to, "dd/MM/yyyy") : "N/A"}</span>
+
                 </h3>
                 <div className="space-y-6">
                   {cancelamentosProcessados.map((item, index) => (
@@ -327,13 +348,6 @@ export function CancelationInPeriod() {
                     />
                   ))}
                 </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Insights e Recomendações
-                </h3>
-                <InsightsAutomaticos dados={cancelamentosProcessados} />
               </div>
             </div>
           ) : (

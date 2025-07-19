@@ -6,16 +6,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EllipsisVertical } from "lucide-react";
+import {  ReceiptText } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { format, isValid, isWithinInterval, parse } from "date-fns";
 import { usePlanilha } from "@/api/planilha";
 import { Pagination } from "@/components/Pagination";
+import { CancelamentoModalDetails } from "./modal-details-cancelation";
 
 
 export function CancelationTable() {
 
+  const [openModalDetails, setOpenModalDetails] = useState<boolean>(false)
+  const [teste, setTeste] = useState({}) 
+  function handleOpenAndCloseModal(cliente) {
+    setTeste(cliente)
+    setOpenModalDetails(!openModalDetails)
+  }
+console.log(openModalDetails)
   const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" });
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -29,7 +37,7 @@ export function CancelationTable() {
   const dateToParam = searchParams.get("dateTo");
   const planParam = searchParams.get("plan");
   const condominiumParam = searchParams.get("condominium")
-  
+
   const cancelamentosFiltrados = cancelamentos?.filter((item) => {
     const name = item.nome?.toLowerCase() ?? "";
     const idCliente = String(item.idCliente ?? "").toLowerCase();
@@ -124,6 +132,7 @@ export function CancelationTable() {
 
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
+      <CancelamentoModalDetails onClose={()=> setOpenModalDetails(!openModalDetails)} cliente={teste} isOpen={openModalDetails}/>
       <Table>
         <TableHeader className="sticky top-0 bg-gray-50 tracking-wide z-10 border-b border-gray-200 text-gray-700 text-sm">
 
@@ -136,7 +145,7 @@ export function CancelationTable() {
             <TableHead className="font-bold">Bairro</TableHead>
             <TableHead className="font-bold">Condomínio</TableHead>
             <TableHead className="font-bold">Tempo ativo</TableHead>
-            <TableHead className="font-bold">Ações</TableHead>
+          
           </TableRow>
         </TableHeader>
         <TableBody className="hover:cursor-pointer">
@@ -203,12 +212,14 @@ export function CancelationTable() {
                   )}
                 </TableCell>
                 <TableCell className="flex justify-center">
-                  <EllipsisVertical onClick={() => alert("oi")} className="w-5 h-5" />
+                  <ReceiptText onClick={() => handleOpenAndCloseModal(item)} className="w-5 h-5" />
                 </TableCell>
               </TableRow>
             ))
+
           )}
         </TableBody>
+
       </Table>
 
 
