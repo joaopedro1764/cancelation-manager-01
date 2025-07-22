@@ -1,7 +1,7 @@
 import { CancelationDayCard } from "@/components/Cards/CancelationDayCard";
 import { CancelationMonthsCard } from "@/components/Cards/CancelationMonthsCard";
+import { CancelationWeek } from "@/components/Cards/CancelationWeek";
 import { ClientsActiveCard } from "@/components/Cards/ClientsActiveCard";
-import { RetentionMonthCard } from "@/components/Cards/RetentionMonthCard";
 import { CancelationInPeriod } from "@/components/Graphics/Cancelation/cancelation-in-period";
 import { RetentionInMonth } from "@/components/Graphics/Retention/retention-in-month";
 
@@ -13,7 +13,8 @@ export function Dashboard() {
         <ClientsActiveCard />
         <CancelationMonthsCard />
         <CancelationDayCard />
-        <RetentionMonthCard />
+        <CancelationWeek />
+       {/*  <RetentionMonthCard /> */}
       </div>
       <div className="w-full space-x-4 flex flex-col xl:flex-row mt-5 overflow-hidden">
         <CancelationInPeriod />

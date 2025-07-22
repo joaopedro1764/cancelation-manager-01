@@ -63,7 +63,7 @@ export function CancelamentoModalDetails({ isOpen, onClose, cliente }: Cancelame
                 </button>
               </div>
             </div>
-            <div className="p-6 print:p-4 space-y-4">
+            <div className="p-6 print:p-4 space-y-4 font-bold">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 print:grid-cols-2">
                 <Item label="Data Ativação" value={format(cliente.dataAtivacao, "dd/MM/yyyy")} />
                 <Item label="Data Cancelamento" value={format(cliente.dataCancelamento, "dd/MM/yyyy")} />
@@ -73,7 +73,7 @@ export function CancelamentoModalDetails({ isOpen, onClose, cliente }: Cancelame
                 <Item label="ID Atendimento" value={cliente.idAtendimento} />
                 <Item label="Plano" value={cliente.plano} />
                 <Item label="Nome" value={cliente.nome} />
-                <Item label="Sexo" value={cliente.sexo} />
+                <Item label="Sexo" value={cliente.sexo === "M" ? "Masculino" : "Feminino"} />
                 <Item label="Rua" value={cliente.rua} />
                 <Item label="Bairro" value={cliente.bairro} />
                 {cliente.condominio && (

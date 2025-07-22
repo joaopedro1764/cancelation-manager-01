@@ -6,24 +6,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {  ReceiptText } from "lucide-react";
+import { List } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { format, isValid, isWithinInterval, parse } from "date-fns";
 import { usePlanilha } from "@/api/planilha";
 import { Pagination } from "@/components/Pagination";
 import { CancelamentoModalDetails } from "./modal-details-cancelation";
+import type { CancelamentoItem } from "@/utils";
 
 
 export function CancelationTable() {
 
   const [openModalDetails, setOpenModalDetails] = useState<boolean>(false)
-  const [teste, setTeste] = useState({}) 
-  function handleOpenAndCloseModal(cliente) {
-    setTeste(cliente)
+  const [selectedItem, setSelectedItem] = useState<CancelamentoItem>()
+  
+  function handleOpenAndCloseModal(itemCancelation: CancelamentoItem) {
+    setSelectedItem(itemCancelation)
     setOpenModalDetails(!openModalDetails)
   }
-console.log(openModalDetails)
+
   const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" });
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -132,7 +134,7 @@ console.log(openModalDetails)
 
   return (
     <div className="overflow-y-auto max-h-[calc(100vh-300px)] scroll-smooth motion-safe:will-change-transform">
-      <CancelamentoModalDetails onClose={()=> setOpenModalDetails(!openModalDetails)} cliente={teste} isOpen={openModalDetails}/>
+      <CancelamentoModalDetails onClose={() => setOpenModalDetails(!openModalDetails)} cliente={selectedItem} isOpen={openModalDetails} />
       <Table>
         <TableHeader className="sticky top-0 bg-gray-50 tracking-wide z-10 border-b border-gray-200 text-gray-700 text-sm">
 
@@ -145,7 +147,7 @@ console.log(openModalDetails)
             <TableHead className="font-bold">Bairro</TableHead>
             <TableHead className="font-bold">Condomínio</TableHead>
             <TableHead className="font-bold">Tempo ativo</TableHead>
-          
+            <TableHead className="font-bold">Detalhes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody className="hover:cursor-pointer">
@@ -212,14 +214,14 @@ console.log(openModalDetails)
                   )}
                 </TableCell>
                 <TableCell className="flex justify-center">
-                  <ReceiptText onClick={() => handleOpenAndCloseModal(item)} className="w-5 h-5" />
+                  <List onClick={() => handleOpenAndCloseModal(item)} className="w-6 h-6 text-blue-700 font-bold" />
                 </TableCell>
               </TableRow>
             ))
           )}
         </TableBody>
       </Table>
-     <Pagination
+      <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         itemsPerPage={itemsPerPage}
