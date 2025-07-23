@@ -114,9 +114,9 @@ export function RetentionInMonth() {
   const percentualMaiorSetor = total > 0 ? (setorComMaisRetencoes.quantidade / total) * 100 : 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 overflow-auto [&::-webkit-scrollbar]:w-2 
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-[calc(100vh-260px)] overflow-auto [&::-webkit-scrollbar]:w-2 
   [&::-webkit-scrollbar-track]:bg-gray-100 
-  [&::-webkit-scrollbar-thumb]:bg-blue-200 
+  [&::-webkit-scrollbar-thumb]:bg-blue-500/50 
   [&::-webkit-scrollbar-thumb]:rounded-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">

@@ -1,4 +1,4 @@
-import { TrendingDown, UserMinus } from "lucide-react";
+import { CalendarMinus, TrendingDown } from "lucide-react";
 
 export function CancelationDayCard() {
   return (
@@ -12,7 +12,7 @@ export function CancelationDayCard() {
           - 5% referente a ontem
         </p>
       </div>
-      <UserMinus className="h-12 w-12 text-cyan-500" />
+      <CalendarMinus  className="h-12 w-12 text-cyan-500" />
     </div>
   </div>
   );

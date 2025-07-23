@@ -129,122 +129,122 @@ export function CancelationInPeriod() {
 
   const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" })
 
- const { resumo: cancelamentosProcessados, bairrosInviabilidade, motivosInsatisfacao, provedoreTrocados } = useMemo(() => {
-  if (!cancelamentos || !Array.isArray(cancelamentos)) {
-    return { resumo: [], bairrosInviabilidade: [], motivosInsatisfacao: [], provedoreTrocados: [] };
-  }
+  const { resumo: cancelamentosProcessados, bairrosInviabilidade, motivosInsatisfacao, provedoreTrocados } = useMemo(() => {
+    if (!cancelamentos || !Array.isArray(cancelamentos)) {
+      return { resumo: [], bairrosInviabilidade: [], motivosInsatisfacao: [], provedoreTrocados: [] };
+    }
 
-  const { from, to } = dateRange || {};
+    const { from, to } = dateRange || {};
 
-  // Utilitários de agrupamento
-  const contagemMap = new Map();
-  const bairrosMap = new Map();
-  const provedoresMap = new Map();
-  const insatisfacaoMap = new Map();
+    // Utilitários de agrupamento
+    const contagemMap = new Map();
+    const bairrosMap = new Map();
+    const provedoresMap = new Map();
+    const insatisfacaoMap = new Map();
 
-  const filtrados = cancelamentos.filter((item) => {
-    const data = formatarData(item.dataCancelamento);
-    return data && (!from || data >= from) && (!to || data <= to);
-  });
+    const filtrados = cancelamentos.filter((item) => {
+      const data = formatarData(item.dataCancelamento);
+      return data && (!from || data >= from) && (!to || data <= to);
+    });
 
-  filtrados.forEach((item) => {
-    const data = formatarData(item.dataCancelamento);
-    if (!data) return;
+    filtrados.forEach((item) => {
+      const data = formatarData(item.dataCancelamento);
+      if (!data) return;
 
-    const motivo = item.motivoReal?.trim() || "Motivo não informado";
-    const motivoInsatisfacao = item.motivoInsatisfacao?.trim() || "";
-    const localInviabilidade = item.localInviabilidade?.trim() || "";
+      const motivo = item.motivoReal?.trim() || "Motivo não informado";
+      const motivoInsatisfacao = item.motivoInsatisfacao?.trim() || "";
+      const localInviabilidade = item.localInviabilidade?.trim() || "";
 
-    // Agrupamento principal
-    const chaveMotivo = motivo;
-    const entry = contagemMap.get(chaveMotivo);
-    if (entry) {
-      entry.quantidade += 1;
-      entry.datas.push(data);
-    } else {
-      contagemMap.set(chaveMotivo, {
+      // Agrupamento principal
+      const chaveMotivo = motivo;
+      const entry = contagemMap.get(chaveMotivo);
+      if (entry) {
+        entry.quantidade += 1;
+        entry.datas.push(data);
+      } else {
+        contagemMap.set(chaveMotivo, {
+          motivo,
+          motivoInsatisfacao,
+          localInviabilidade,
+          quantidade: 1,
+          datas: [data],
+        });
+      }
+
+      // Mudança de endereço
+      if (motivo === "Mudanca de Endereco (Inviabilidade Tecnica)") {
+        const bairro = localInviabilidade || "Bairro não informado";
+        bairrosMap.set(bairro, {
+          quantidade: (bairrosMap.get(bairro)?.quantidade || 0) + 1,
+        });
+      }
+
+      // Troca de provedor
+      if (motivo.includes("Trocou de Provedor")) {
+        const provedor = item.provedor?.trim() || "Provedor não informado";
+        provedoresMap.set(provedor, {
+          quantidade: (provedoresMap.get(provedor)?.quantidade || 0) + 1,
+        });
+      }
+
+      // Insatisfação
+      if (motivo === "Insatisfacao com servico prestado") {
+        const motivoInsat = motivoInsatisfacao || "Motivo não informado";
+        insatisfacaoMap.set(motivoInsat, {
+          quantidade: (insatisfacaoMap.get(motivoInsat)?.quantidade || 0) + 1,
+        });
+      }
+    });
+
+    // Resultado principal
+    const mesAtual = format(new Date(), "MMMM/yyyy", { locale: ptBR });
+    const resultadoPrincipal = Array.from(contagemMap.entries())
+      .map(([_, { motivo, motivoInsatisfacao, quantidade, datas }], index) => ({
+        id: String(index + 1),
         motivo,
         motivoInsatisfacao,
-        localInviabilidade,
-        quantidade: 1,
-        datas: [data],
-      });
-    }
+        quantidade,
+        porcentagem: filtrados.length > 0 ? Math.round((quantidade / filtrados.length) * 100) : 0,
+        setor: definirSetor(motivo),
+        mes: capitalizarPrimeiraLetra(mesAtual),
+        dataCancelamento: datas[0],
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
 
-    // Mudança de endereço
-    if (motivo === "Mudanca de Endereco (Inviabilidade Tecnica)") {
-      const bairro = localInviabilidade || "Bairro não informado";
-      bairrosMap.set(bairro, {
-        quantidade: (bairrosMap.get(bairro)?.quantidade || 0) + 1,
-      });
-    }
+    // Bairros
+    const bairrosInviabilidade = Array.from(bairrosMap.entries())
+      .map(([bairro, { quantidade }], index) => ({
+        id: String(index + 1),
+        bairro,
+        quantidade,
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
 
-    // Troca de provedor
-    if (motivo.includes("Trocou de Provedor")) {
-      const provedor = item.provedor?.trim() || "Provedor não informado";
-      provedoresMap.set(provedor, {
-        quantidade: (provedoresMap.get(provedor)?.quantidade || 0) + 1,
-      });
-    }
+    // Provedores
+    const provedoreTrocados = Array.from(provedoresMap.entries())
+      .map(([provedor, { quantidade }], index) => ({
+        id: String(index + 1),
+        provedor,
+        quantidade,
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
 
     // Insatisfação
-    if (motivo === "Insatisfacao com servico prestado") {
-      const motivoInsat = motivoInsatisfacao || "Motivo não informado";
-      insatisfacaoMap.set(motivoInsat, {
-        quantidade: (insatisfacaoMap.get(motivoInsat)?.quantidade || 0) + 1,
-      });
-    }
-  });
+    const motivosInsatisfacao = Array.from(insatisfacaoMap.entries())
+      .map(([motivoInsatisfacao, { quantidade }], index) => ({
+        id: String(index + 1),
+        motivoInsatisfacao,
+        quantidade,
+      }))
+      .sort((a, b) => b.quantidade - a.quantidade);
 
-  // Resultado principal
-  const mesAtual = format(new Date(), "MMMM/yyyy", { locale: ptBR });
-  const resultadoPrincipal = Array.from(contagemMap.entries())
-    .map(([_, { motivo, motivoInsatisfacao, quantidade, datas }], index) => ({
-      id: String(index + 1),
-      motivo,
-      motivoInsatisfacao,
-      quantidade,
-      porcentagem: filtrados.length > 0 ? Math.round((quantidade / filtrados.length) * 100) : 0,
-      setor: definirSetor(motivo),
-      mes: capitalizarPrimeiraLetra(mesAtual),
-      dataCancelamento: datas[0],
-    }))
-    .sort((a, b) => b.quantidade - a.quantidade);
-
-  // Bairros
-  const bairrosInviabilidade = Array.from(bairrosMap.entries())
-    .map(([bairro, { quantidade }], index) => ({
-      id: String(index + 1),
-      bairro,
-      quantidade,
-    }))
-    .sort((a, b) => b.quantidade - a.quantidade);
-
-  // Provedores
-  const provedoreTrocados = Array.from(provedoresMap.entries())
-    .map(([provedor, { quantidade }], index) => ({
-      id: String(index + 1),
-      provedor,
-      quantidade,
-    }))
-    .sort((a, b) => b.quantidade - a.quantidade);
-
-  // Insatisfação
-  const motivosInsatisfacao = Array.from(insatisfacaoMap.entries())
-    .map(([motivoInsatisfacao, { quantidade }], index) => ({
-      id: String(index + 1),
-      motivoInsatisfacao,
-      quantidade,
-    }))
-    .sort((a, b) => b.quantidade - a.quantidade);
-
-  return {
-    resumo: resultadoPrincipal,
-    bairrosInviabilidade,
-    motivosInsatisfacao,
-    provedoreTrocados,
-  };
-}, [cancelamentos, dateRange]);
+    return {
+      resumo: resultadoPrincipal,
+      bairrosInviabilidade,
+      motivosInsatisfacao,
+      provedoreTrocados,
+    };
+  }, [cancelamentos, dateRange]);
 
 
   const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
@@ -274,7 +274,7 @@ export function CancelationInPeriod() {
                 )
               }
               {
-                provedoreTrocados?.slice(0,3).map((item) => (
+                provedoreTrocados?.slice(0, 3).map((item) => (
                   <p className="font-bold text-blue-900 leading-tight">
                     {item.provedor}: {""} {item.quantidade}
                   </p>
@@ -327,9 +327,9 @@ export function CancelationInPeriod() {
     : 1;
 
   return (
-    <div className="w-full max-w-7xl h-[calc(100vh-240px)] overflow-y-auto [&::-webkit-scrollbar]:w-2 
+    <div className="w-full max-w-7xl h-[calc(100vh-260px)] overflow-y-auto [&::-webkit-scrollbar]:w-2 
   [&::-webkit-scrollbar-track]:bg-gray-100 
-  [&::-webkit-scrollbar-thumb]:bg-blue-200 
+  [&::-webkit-scrollbar-thumb]:bg-blue-500/50 
   [&::-webkit-scrollbar-thumb]:rounded-full">
       <div className="bg-white rounded-xl shadow-lg border border-gray-200">
         {/* Header */}

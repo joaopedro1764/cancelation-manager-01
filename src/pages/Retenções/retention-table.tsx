@@ -27,11 +27,11 @@ export function RetentionTable() {
     clientName: searchParams.get("clientName")?.toLowerCase().trim(),
     dateFrom: searchParams.get("dateFrom"),
     dateTo: searchParams.get("dateTo"),
-    reason: searchParams.get("reason")?.toLowerCase().trim(),
+    retencaoAplicada: searchParams.get("retencaoAplicada")?.toLowerCase().trim(),
     month: searchParams.get("month")?.toLowerCase().trim(),
     sector: searchParams.get("sector")?.toLowerCase().trim(),
     colaborator: searchParams.get("colaborator")?.toLowerCase().trim(),
-    dificulty: searchParams.get("difficulty")?.toLowerCase().trim(),
+    difficulty: searchParams.get("difficulty")?.toLowerCase().trim(),
   };
 
 
@@ -47,11 +47,11 @@ export function RetentionTable() {
     const idCliente = String(item.idCliente ?? "").toLowerCase();
     const contrato = String(item.idContrato ?? "").toLowerCase();
     const atendimento = String(item.idAtendimento ?? "").toLowerCase();
-    const motivo = item.motivoCancelamento?.toLowerCase() ?? "";
+    const retencaoAplicada = item.retencaoAplicada?.toLowerCase() ?? "";
     const setor = item.setor?.toLowerCase() ?? "";
     const colaborador = item.responsavel?.toLowerCase() ?? "";
     const dificuldade = item.dificuldade?.toLowerCase() ?? "";
-    const mes = item.mesReferencia?.toLowerCase() ?? "";
+
 
     const dataRegistro = item.dataRetencao && isValid(new Date(item.dataRetencao))
       ? new Date(item.dataRetencao)
@@ -60,19 +60,17 @@ export function RetentionTable() {
     const isInDateRange = dataRegistro && parsedFrom && parsedTo
       ? isWithinInterval(dataRegistro, { start: parsedFrom, end: parsedTo })
       : true;
-  
-      console.log(filters.reason)
+
 
     return (
       (!filters.userId || idCliente.includes(filters.userId)) &&
       (!filters.clientName || nome.includes(filters.clientName)) &&
       (!filters.contractId || contrato.includes(filters.contractId)) &&
       (!filters.attendanceId || atendimento.includes(filters.attendanceId)) &&
-      (!filters.reason || motivo.includes(`retencao - ${filters.reason}`)) &&
+      (!filters.retencaoAplicada || retencaoAplicada.includes(`retencao - ${filters.retencaoAplicada}`)) &&
       (!filters.sector || setor.includes(filters.sector)) &&
       (!filters.colaborator || colaborador.includes(filters.colaborator)) &&
-      (!filters.dificulty || dificuldade.includes(filters.dificulty)) &&
-      (!filters.month || mes.includes(filters.month)) &&
+      (!filters.difficulty || dificuldade.includes(filters.difficulty)) &&
       isInDateRange
     );
   });
@@ -105,7 +103,7 @@ export function RetentionTable() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters.clientName, filters.userId, filters.reason]);
+  }, [filters.clientName, filters.userId, filters.retencaoAplicada]);
 
   const motivoCores = {
     "Baixa": "bg-green-500",
@@ -153,10 +151,10 @@ export function RetentionTable() {
               </TableRow>
             )
           }
-          {paginatedItems.length === 0 ? (
+          {paginatedItems && paginatedItems?.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="h-24 text-center">
-                Nenhum resultado encontrado.
+              <TableCell colSpan={10} className="h-24 text-center">
+                <span className="font-bold text-gray-500">Nenhum resultado encontrado</span>
               </TableCell>
             </TableRow>
           ) : (
@@ -175,10 +173,10 @@ export function RetentionTable() {
                   {item.motivoCancelamento}
                 </TableCell>
                 <TableCell
-                  title={item.retençãoAplicada}
+                  title={item.retencaoAplicada}
                   className="whitespace-nowrap max-w-[140px] truncate"
                 >
-                  {item.retençãoAplicada}
+                  {item.retencaoAplicada}
                 </TableCell>
                 <TableCell
                   className="whitespace-nowrap max-w-[140px] truncate"
@@ -198,12 +196,13 @@ export function RetentionTable() {
                 <TableCell
                   className="whitespace-nowrap max-w-[140px] truncate"
                 >
-                  <span className={`${getMotivoColor(item.dificuldade)} text-white font-medium rounded-full px-2 py-1`}>{item.dificuldade}</span> 
+                  <span className={`${getMotivoColor(item.dificuldade)} text-white font-medium rounded-full px-2 py-1`}>{item.dificuldade}</span>
                 </TableCell>
               </TableRow>
             ))
           )}
         </TableBody>
+
       </Table>
 
 
@@ -221,7 +220,7 @@ export function RetentionTable() {
         goToLastPage={goToLastPage}
       />
 
-   
+
     </div>
   );
 }

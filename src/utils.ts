@@ -1,21 +1,5 @@
 import { z } from "zod";
 
-export interface PieChartPayload {
-  name: number;
-  value: number;
-  dataKey: string;
-  cx: string;
-  cy: string;
-  fill: string;
-  stroke: string;
-  payload: {
-    porcentagem: number;
-    quantidades: number;
-    setor: string;
-  };
-  type?: string;
-  className?: string;
-}
 
 interface Colaboradores {
   nome: string;
@@ -62,6 +46,7 @@ export const SearchProps = z.object({
   neighborhood: z.string().optional(),
   colaborator: z.string().optional(),
   reason: z.string().optional(),
+  retencaoAplicada: z.string().optional(),
   sector: z.string().optional(),
   month: z.string().optional(),
   plan: z.string().optional(),
@@ -75,20 +60,6 @@ export const SearchProps = z.object({
     .optional(),
 });
 
-export const months = [
-  "Janeiro",
-  "Fevereiro",
-  "Março",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
-];
 
 export const sectors = [
   "Cancelamento",
@@ -121,30 +92,32 @@ export const motivosCancelamentos = [
 ];
 
 export const motivosRetencoes = [
-  "Isenção de uma mensalidade",
+  "Isencao de uma mensalidade",
   "Upgrade de plano, 3 meses da mensalidade atual",
   "Desconto por 3 meses",
   "Desconto por 6 meses",
   "Desconto por 1 ano",
-  "Troca de titularidade concluída",
+  "Troca de titularidade concluida",
   "Downgrade do plano",
-  "Encaixe de ordem de serviço",
-  "Diálogo e retratação",
+  "Encaixe de ordem de servico",
+  "Dialogo e retratacao",
   "Upgrade do plano",
-  "Diálogo com ênfase em nossa qualidade",
+  "Dialogo com enfase em nossa qualidade",
   "Upgrade de plano e troca de equipamento",
   "Realizado suporte remoto",
-  "Mediante visita técnica",
-  "Implantação novo endereço",
+  "Mediante visita tecnica",
+  "Implantacao novo endereco",
   "Troca de equipamento",
-  "Desconto pontual, redução de 1 mensalidade",
+  "Desconto pontual, reducao de 1 mensalidade",
   "Postergado data de vencimento",
-  "Redução taxa de serviço",
-  "Isenção taxa de serviço",
+  "Reducao taxa de servico",
+  "Isencao taxa de servico",
   "Apenas retirado juros da mensalidade",
   "Proposta Black Friday",
-  "Cancelou e reativou no mesmo mês",
-  "Retenção - Reativou após pausa no"
+  "Cancelou e reativou no mesmo mes",
+  "Retencao - Reativou apos pausa no contrato",
+  "Renegociacao de debitos",
+  "Adicao de mais Mega"
 ]
 
 export const difficultys = [
@@ -163,6 +136,7 @@ export type CancelamentoItem = {
   bairro?: string;
   motivoReal?: string;
   dataCancelamento: string;
+  retencaoAplicada?:string;
   condominio?: string;
   [key: string]: any;
 };

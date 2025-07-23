@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter, Search, X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { colaborators, difficultys, months, motivosRetencoes, SearchProps, sectors } from "@/utils";
+import { colaborators, difficultys, motivosRetencoes, SearchProps, sectors } from "@/utils";
 import { useState } from "react";
 import type { z } from "zod";
 import { useSearchParams } from "react-router-dom";
@@ -25,13 +25,13 @@ export function RetentionFilter() {
 
   const clientName = searchParams.get("clientName");
   const userId = searchParams.get("userId");
-  const reason = searchParams.get("reason");
+  const retencaoAplicada = searchParams.get("retencaoAplicada");
   const sector = searchParams.get("sector");
   const { handleSubmit, register, control, reset } = useForm<NewSearchRetentionType>({
     values: {
       clientName: clientName ?? "",
       userId: userId ?? "",
-      reason: reason ?? "",
+      retencaoAplicada: retencaoAplicada ?? "",
       sector: sector ?? "",
        dateRange: {
         from: dateRangeCalendar?.to,
@@ -126,21 +126,12 @@ export function RetentionFilter() {
               />
 
               <SelectPopoverField
-                name="reason"
+                name="retencaoAplicada"
                 control={control}
                 options={motivosRetencoes}
-                placeholder="Selecione o motivo"
-                emptyText="Nenhum motivo encontrado."
+                placeholder="Selecione o motivo de retenção aplicada"
+                emptyText="Nenhum motivo."
                 aria-label="Motivo"
-              />
-
-              <SelectPopoverField
-                name="month"
-                control={control}
-                options={months}
-                placeholder="Selecione o mês"
-                emptyText="Nenhum mês encontrado."
-                aria-label="Mês"
               />
 
               <SelectPopoverField

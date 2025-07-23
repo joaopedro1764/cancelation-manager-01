@@ -8,18 +8,25 @@ import { RetentionInMonth } from "@/components/Graphics/Retention/retention-in-m
 export function Dashboard() {
   return (
 
-    <main className="flex flex-col h-full">
-      <div className="grid grid-cols-4 gap-4">
+    <main className="flex flex-col h-full p-4">
+      {/* Linha de cards principais */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <ClientsActiveCard />
         <CancelationMonthsCard />
         <CancelationDayCard />
         <CancelationWeek />
-       {/*  <RetentionMonthCard /> */}
+        {/* <RetentionMonthCard /> */}
       </div>
-      <div className="w-full space-x-4 flex flex-col xl:flex-row mt-5 overflow-hidden">
-        <CancelationInPeriod />
-        <RetentionInMonth />
+
+      {/* Linha inferior com gráficos ou seções maiores */}
+      <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:gap-4 w-full">
+        <div className="w-full xl:w-[70%]">
+          <CancelationInPeriod />
+        </div>
+        <div className="w-full xl:w-[30%] overflow-auto">
+          <RetentionInMonth />
+        </div>
       </div>
     </main>
-  );
+  )
 }

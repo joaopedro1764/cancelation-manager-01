@@ -165,8 +165,8 @@ export function CancelationTable() {
           }
           {paginatedItems && paginatedItems?.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="h-24 text-center">
-                Nenhum resultado encontrado.
+              <TableCell colSpan={10} className="h-24 text-center">
+              <span className="font-bold text-gray-500">Nenhum resultado encontrado</span>
               </TableCell>
             </TableRow>
           ) : (
