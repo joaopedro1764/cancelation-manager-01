@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { AlertTriangle, CheckCircle, TrendingDown, TrendingUp, XCircle } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle, TrendingDown, TrendingUp, XCircle } from "lucide-react";
 import { format } from 'date-fns';
 
 interface ToastMessage {
@@ -224,65 +224,43 @@ export function CancelationWeek() {
     const toastMessage = getToastMessage({ value: String(currentValue), type: cardData.toastType });
 
     return (
-        <>
-            <div
-                ref={cardRef}
-                className={`p-6 rounded-lg shadow-md border-l-4 ${cardData.borderCard} transition-all duration-500 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 ${isAnimating ? 'scale-105 shadow-xl' : ''}`}
-                role="region"
-                aria-labelledby="cancellation-title"
-                aria-describedby="cancellation-description"
-            >
-                <div className="space-y-3">
-                    <h2 id="cancellation-title" className="text-xl font-bold">
-                        Cancelamentos (semanal)
-                    </h2>
-                    <div className="flex justify-between items-center gap-3">
-                        <div className='flex items-center gap-3'>
-                            <span
-                                className={`text-4xl font-bold text-gray-900 transition-all duration-500 ${isAnimating ? 'scale-110' : ''}`}
-                                aria-label={`${currentValue} cancelamentos`}
-                            >
-                                {currentValue}
-                            </span>
-
-                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${cardData.colorCard}`}>
-                                Nível {cardData.level}
-                            </span>
-                        </div>
-                        {getIconByLevel(cardData.level)}
-                    </div>
-                    {cardData && (
-                        <div className="flex items-center gap-2" role="alert" aria-live="polite">
-                            <div className={`${cardData.colorCard} h-2 w-2 rounded-full`} aria-hidden="true"></div>
-                            <span className={`text-sm p-1 rounded font-medium ${cardData.colorCard}`}>
-                                {cardData.criticalMessage}
-                            </span>
-                        </div>
-                    )}
-                </div>
+        <div className="relative bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl shadow-lg border border-green-100 overflow-hidden group hover:shadow-xl transition-all duration-300">
+      {/* Background Pattern */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-full -translate-y-16 translate-x-16"></div>
+      <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-br from-green-300/10 to-emerald-300/10 rounded-full translate-y-10 -translate-x-10"></div>
+      
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
+              <Calendar className="h-6 w-6 text-white" />
             </div>
-
-            <style>{`
-        .sr-only {
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border: 0;
-        }
-      `}</style>
-
-            {showToast && (
-                <Toast
-                    message={toastMessage}
-                    type={toastMessage.type}
-                    onClose={() => setShowToast(false)}
-                />
-            )}
-        </>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Cancelamentos</p>
+              <p className="text-xs text-gray-500">Esta semana</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-1 bg-green-50 px-2 py-1 rounded-full">
+            <TrendingUp className="h-3 w-3 text-green-500" />
+            <span className="text-xs font-semibold text-green-600">Baixo</span>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="flex items-baseline space-x-2">
+            <span className="text-4xl font-bold text-gray-900">50</span>
+            <span className="text-sm text-gray-500">cancelamentos</span>
+          </div>
+          <p className="text-sm text-gray-600">
+            <span className="text-green-600 font-medium">Nível baixo</span> - Padrão normal
+          </p>
+        </div>
+        
+        {/* Progress indicator */}
+        <div className="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+          <div className="bg-gradient-to-r from-green-500 to-emerald-600 h-1.5 rounded-full w-1/3"></div>
+        </div>
+      </div>
+    </div>
     );
 }

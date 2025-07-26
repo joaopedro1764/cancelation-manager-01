@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { format, isValid, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { TrendingUp, AlertTriangle, RefreshCcw } from "lucide-react";
+import { TrendingUp, AlertTriangle, RefreshCcw, BarChart3, Users } from "lucide-react";
 import { usePlanilha } from "@/api/planilha";
 import { DateRangePicker } from "../../ui/date-range-picker";
 import { CancelationInPeriodSkeleton } from "./cancelation-in-period-skeleton";
@@ -120,6 +120,7 @@ const ItemGrafico = ({
     </div>
   );
 };
+
 
 export function CancelationInPeriod() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -246,79 +247,145 @@ export function CancelationInPeriod() {
     };
   }, [cancelamentos, dateRange]);
 
-
   const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
 
-    const totalCancelamentos = dados.reduce((sum, item) => sum + item.quantidade, 0);
     const principalMotivo = dados.length > 0 ? dados[0] : null;
 
     return (
-      <>
-        <div className="flex mb-2 -my-8">
-          <span className="bg-blue-50 shadow text-black/70 font-bold rounded px-3 py-1.5">
-            {totalCancelamentos} cancelamentos no período selecionado: {""}
-            {dateRange?.from ? format(dateRange.from, "dd/MM/yyyy") : "N/A"} - {dateRange?.to ? format(dateRange.to, "dd/MM/yyyy") : "N/A"}</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 transition-all">
-            <div className="flex items-center gap-2 mb-2">
-              <RefreshCcw className="h-5 w-5 text-blue-600 flex-shrink-0" />
-              <span className="text-sm font-medium text-blue-900">Troca de provedor</span>
-            </div>
-            <div className="flex flex-col  space-y-5">
+        {/* Card Troca de Provedor */}
+        <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-2xl shadow-lg border border-blue-100 overflow-hidden group hover:shadow-xl transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-200/20 to-cyan-200/20 rounded-full -translate-y-12 translate-x-12"></div>
 
-              {
-                provedoreTrocados.length === 0 && (
-                  <span className="text-sm text-center font-bold text-blue-900">Nenhum cancelamento por troca de provedor</span>
-                )
-              }
-              {
-                provedoreTrocados?.slice(0, 3).map((item) => (
-                  <p className="font-bold text-blue-900 leading-tight">
-                    {item.provedor}: {""} {item.quantidade}
-                  </p>
-                ))
-              }
-
-            </div>
-          </div>
-
-          <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 transition-all">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-5 w-5 text-orange-600 flex-shrink-0" />
-              <span className="text-sm font-medium text-orange-900">Principal Motivo</span>
-            </div>
-            <p className="text-sm font-bold text-orange-900 leading-tight" title={principalMotivo?.motivo}>
-              {principalMotivo?.motivo && principalMotivo.motivo.length > 25
-                ? `${principalMotivo.motivo}`
-                : principalMotivo?.motivo || "N/A"}
-              <div className="space-y-3 mt-2">
-                {
-                  bairrosInviabilidade.slice(0, 3).map((item) => (
-                    <p>{item.bairro}: {item.quantidade}</p>
-                  ))
-                }
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl shadow-lg">
+                  <RefreshCcw className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Troca de Provedor</h4>
+                  <p className="text-xs text-gray-500">Por operadora</p>
+                </div>
               </div>
-            </p>
-
-          </div>
-
-          <div className="bg-red-50 p-4 rounded-lg border border-red-200 transition-all sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <span className="text-sm font-medium text-red-900">Motivos insatisfação:</span>
             </div>
-            <div className="flex flex-col justify-between flex-1 space-y-3 font-bold text-red-900">
-              {
-                motivosInsatisfacao.slice(0, 3).map((item) => (
-                  <p className="text-sm">{item.motivoInsatisfacao}: {item.quantidade}</p>
+            <div className="mb-4">
+              <div className="bg-white/50 p-3 rounded-lg backdrop-blur-sm">
+                <p className="font-medium text-blue-900 text-sm leading-relaxed">
+                  Troca de provedor (pacotes de dados móveis incluso)
+                </p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {provedoreTrocados.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-gray-500">Nenhum cancelamento por troca de provedor</p>
+                </div>
+              ) : (
+                provedoreTrocados.slice(0, 3).map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                    <span className="font-medium text-gray-800">{item.provedor}</span>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold text-blue-700">{item.quantidade}</span>
+                      <div className="w-12 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-blue-500 to-cyan-600 h-2 rounded-full"
+                          style={{ width: `${(item.quantidade / Math.max(...provedoreTrocados.map(p => p.quantidade))) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
                 ))
-              }
+              )}
             </div>
           </div>
         </div>
-      </>
+
+        {/* Card Principal Motivo */}
+        <div className="relative bg-gradient-to-br from-orange-50 to-yellow-50 p-6 rounded-2xl shadow-lg border border-orange-100 overflow-hidden group hover:shadow-xl transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-200/20 to-yellow-200/20 rounded-full -translate-y-12 translate-x-12"></div>
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-3 bg-gradient-to-br from-orange-500 to-yellow-600 rounded-xl shadow-lg">
+                  <TrendingUp className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Principal Motivo</h4>
+                  <p className="text-xs text-gray-500">Inviabilidade técnica</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="bg-white/50 p-3 rounded-lg backdrop-blur-sm">
+                <p className="font-medium text-orange-900 text-sm leading-relaxed">
+                  {principalMotivo?.motivo || "Mudança de Endereço (Inviabilidade Técnica)"}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Principais regiões:</p>
+              {bairrosInviabilidade.slice(0, 3).map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-2 bg-white/30 rounded-lg">
+                  <span className="text-sm font-medium text-gray-800">{item.bairro}</span>
+                  <span className="font-bold text-orange-700">{item.quantidade}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Card Motivos Insatisfação */}
+        <div className="relative bg-gradient-to-br from-red-50 to-pink-50 p-6 rounded-2xl shadow-lg border border-red-100 overflow-hidden group hover:shadow-xl transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-200/20 to-pink-200/20 rounded-full -translate-y-12 translate-x-12"></div>
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl shadow-lg">
+                  <AlertTriangle className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Insatisfação</h4>
+                  <p className="text-xs text-gray-500">Principais motivos</p>
+                </div>
+              </div>
+            </div>
+
+
+  <div className="mb-4">
+              <div className="bg-white/50 p-3 rounded-lg backdrop-blur-sm">
+                <p className="font-medium text-rose-900 text-sm leading-relaxed">
+                  Lentidão e oscilação (Somente WI-FI)
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {motivosInsatisfacao.slice(0, 3).map((item, index) => (
+                <div key={index} className="p-3 bg-white/50 rounded-lg backdrop-blur-sm">
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-800 leading-tight flex-1">
+                      {item.motivoInsatisfacao}
+                    </span>
+                    <span className="font-bold text-red-700 ml-2">{item.quantidade}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div
+                      className="bg-gradient-to-r from-red-500 to-pink-600 h-1.5 rounded-full"
+                      style={{ width: `${(item.quantidade / Math.max(...motivosInsatisfacao.map(m => m.quantidade))) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -329,24 +396,33 @@ export function CancelationInPeriod() {
   return (
     <div className="w-full max-w-7xl h-[calc(100vh-260px)] overflow-y-auto [&::-webkit-scrollbar]:w-2 
   [&::-webkit-scrollbar-track]:bg-gray-100 
-  [&::-webkit-scrollbar-thumb]:bg-blue-500/50 
+  [&::-webkit-scrollbar-thumb]:bg-transparent 
   [&::-webkit-scrollbar-thumb]:rounded-full">
       <div className="bg-white rounded-xl shadow-lg border border-gray-200">
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-100 bg-gray-50">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Análise de Cancelamentos
-              </h2>
-              <p className="text-sm text-gray-600">
-                Visualize os principais dados e motivos dos cancelamentos ocorridos no período selecionado.
-              </p>
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                <BarChart3 className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Análise de Cancelamentos</h3>
+                <p className="text-sm text-gray-600">Visualize os principais dados e motivos dos cancelamentos</p>
+              </div>
             </div>
-            <div>
-              <span className="text-sm font-bold">Filtrar período:</span>
-              <DateRangePicker className="font-bold" date={dateRange} OnDateChange={setDateRange} />
-            </div>
+
+
+            <span className="text-sm font-medium text-gray-700">
+              <DateRangePicker OnDateChange={setDateRange} date={dateRange} />
+            </span>
+
+          </div>
+
+          <div className="mt-4 flex items-center space-x-2">
+            <Users className="h-5 w-5 text-blue-600" />
+            <span className="text-2xl font-bold text-gray-900">{352}</span>
+            <span className="text-gray-600">cancelamentos no período selecionado</span>
           </div>
         </div>
 
@@ -357,8 +433,8 @@ export function CancelationInPeriod() {
             <div className="p-4 sm:p-6">
               <EstatisticasResumo dados={cancelamentosProcessados} />
 
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="my-8">
+                <h3 className="text-lg font-bold text-blue-600 mb-4">
                   Cancelamentos por assunto:
                 </h3>
                 <div className="space-y-6">
