@@ -130,8 +130,7 @@ export function RetentionInMonth() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 
-  [&::-webkit-scrollbar-thumb]:bg-transparent 
-  h-full">
+  [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full h-full">
       {/* Header Moderno */}
       <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-6 text-white">
         {/* Background Pattern */}

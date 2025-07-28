@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { AlertTriangle, Calendar, CheckCircle, TrendingDown, TrendingUp, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, TrendingDown, TrendingUp, XCircle } from "lucide-react";
 import { format } from 'date-fns';
 
 interface ToastMessage {
@@ -23,10 +23,9 @@ interface ToastProps {
 export function CancelationWeek() {
     const [currentValue, setCurrentValue] = useState(50);
     const [showToast, setShowToast] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
     const toastRef = useRef<HTMLDivElement>(null);
     const cardRef = useRef(null);
-    const lastEmailSentRef = useRef<number>(0); // timestamp do último envio
+    const lastEmailSentRef = useRef<number>(0);
 
     const generateRandomValue = () => {
         return Math.floor(Math.random() * (100 - 10 + 1)) + 10;
@@ -35,15 +34,15 @@ export function CancelationWeek() {
     const getCardData = (value: number) => {
         if (value <= 70) {
             return {
-                level: 'baixo',
+                level: 'Baixo',
                 colorCard: 'bg-green-100 text-green-500',
                 borderCard: "border-l-green-500",
                 criticalMessage: 'Nível normal - Padrão',
                 toastType: 'success'
             };
-        } else if (value <= 70) {
+        } else if (value <= 84) {
             return {
-                level: 'moderado',
+                level: 'Normal',
                 colorCard: 'bg-yellow-100 text-yellow-500',
                 borderCard: 'border-l-yellow-500',
                 criticalMessage: 'Nível médio - Atenção',
@@ -51,7 +50,7 @@ export function CancelationWeek() {
             };
         } else {
             return {
-                level: 'alto',
+                level: 'Alto',
                 colorCard: 'bg-red-100 text-red-500',
                 borderCard: 'border-l-red-500',
                 criticalMessage: 'Nível crítico - Ação Recomendada',
@@ -174,10 +173,9 @@ export function CancelationWeek() {
         const updateValue = () => {
             const newValue = generateRandomValue();
             setCurrentValue(newValue);
-            setIsAnimating(true);
+
             setShowToast(true);
 
-            setTimeout(() => setIsAnimating(false), 1000);
             setTimeout(() => setShowToast(false), 5000);
 
             const cardData = getCardData(newValue);
@@ -198,7 +196,7 @@ export function CancelationWeek() {
             }
         };
         //1 em 1 hora
-        const interval = setInterval(updateValue, 3600000);
+        const interval = setInterval(updateValue, 10000);
 
         return () => clearInterval(interval);
     }, []);
@@ -206,61 +204,68 @@ export function CancelationWeek() {
 
     function getIconByLevel(level: string) {
         switch (level) {
-            case "crítico":
-                return <AlertTriangle className="text-red-600 w-12 h-12" />;
-            case "alto":
-                return <TrendingUp className="text-orange-500 w-12 h-12" />;
-            case "normal":
-                return <CheckCircle className="text-green-500 w-12 h-12" />;
-            case "baixo":
-                return <TrendingDown className="text-emerald-500 w-12 h-12" />;
+            case "Crítico":
+                return <AlertTriangle className="text-white w-6 h-6" />;
+            case "Alto":
+                return <TrendingUp className="text-white w-6 h-6" />;
+            case "Normal":
+                return <CheckCircle className="text-white w-6 h-6" />;
+            case "Baixo":
+                return <TrendingDown className="text-white w-6 h-6" />;
             default:
                 return null;
         }
     }
 
-
     const cardData = getCardData(currentValue);
     const toastMessage = getToastMessage({ value: String(currentValue), type: cardData.toastType });
 
+
     return (
         <div className="relative bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl shadow-lg border border-green-100 overflow-hidden group hover:shadow-xl transition-all duration-300">
-      {/* Background Pattern */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-full -translate-y-16 translate-x-16"></div>
-      <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-br from-green-300/10 to-emerald-300/10 rounded-full translate-y-10 -translate-x-10"></div>
-      
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
-              <Calendar className="h-6 w-6 text-white" />
+            {/* Background Pattern */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-200/20 to-emerald-200/20 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-br from-green-300/10 to-emerald-300/10 rounded-full translate-y-10 -translate-x-10"></div>
+
+            <div className="relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                        <div className={`p-3 ${cardData.level === "Alto" ? 'bg-red-400 text-white' : cardData.level === "Baixo" ? 'bg-green-400 text-green-800' : 'bg-yellow-400'}  rounded-xl shadow-lg`}>
+                            {getIconByLevel(cardData.level)}
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-600">Cancelamentos</p>
+                            <p className="text-xs text-gray-500">Esta semana</p>
+                        </div>
+                    </div>
+                    <div className={`flex items-center space-x-1 ${cardData.level === "Alto" ? 'bg-red-400 text-white' : cardData.level === "Baixo" ? 'bg-green-400 text-green-800' : 'bg-yellow-400'}  px-2 py-1 rounded-full`}>
+                        <span className="text-sm font-semibold">{cardData.level}</span>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="flex items-baseline space-x-2">
+                        <span className="text-4xl font-bold text-gray-900">{currentValue}</span>
+                        <span className="text-sm text-gray-500">cancelamentos</span>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                        <span className="text-green-600 font-medium">Nível baixo</span> - Padrão normal
+                    </p>
+                </div>
+
+                {/* Progress indicator */}
+                <div className="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="bg-gradient-to-r from-green-500 to-emerald-600 h-1.5 rounded-full w-1/3"></div>
+                </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Cancelamentos</p>
-              <p className="text-xs text-gray-500">Esta semana</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-1 bg-green-50 px-2 py-1 rounded-full">
-            <TrendingUp className="h-3 w-3 text-green-500" />
-            <span className="text-xs font-semibold text-green-600">Baixo</span>
-          </div>
+            {showToast && (
+                <Toast
+                    message={toastMessage}
+                    type={cardData.toastType}
+                    onClose={() => setShowToast(false)}
+                />
+            )}
         </div>
-        
-        <div className="space-y-2">
-          <div className="flex items-baseline space-x-2">
-            <span className="text-4xl font-bold text-gray-900">50</span>
-            <span className="text-sm text-gray-500">cancelamentos</span>
-          </div>
-          <p className="text-sm text-gray-600">
-            <span className="text-green-600 font-medium">Nível baixo</span> - Padrão normal
-          </p>
-        </div>
-        
-        {/* Progress indicator */}
-        <div className="mt-4 w-full bg-gray-200 rounded-full h-1.5">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 h-1.5 rounded-full w-1/3"></div>
-        </div>
-      </div>
-    </div>
+
     );
 }
