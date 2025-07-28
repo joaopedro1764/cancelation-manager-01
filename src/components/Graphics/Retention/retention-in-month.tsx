@@ -1,18 +1,21 @@
 import React, { useState, type JSX } from 'react';
-import { TrendingUp, Users, Target, DollarSign, Wrench, Headphones, Shield } from 'lucide-react';
-import type { RetentionProps } from '@/utils';
+import { Users, Target, DollarSign, Wrench, Headphones, Shield, Calendar, Activity, ArrowUp } from 'lucide-react';
 import { usePlanilha } from '@/api/planilha';
 import { ColaboradoresRetencaoModal } from './ColaboradoresRetencaoModal';
+import type { RetentionProps } from '@/utils';
+
+
+
 
 export function RetentionInMonth() {
-  const { data: retencoes } = usePlanilha({ aba: "Retenções Outros Setores" });
+
+  const { data: retencoes } = usePlanilha({ aba: "Retenções Outros Setores" })
 
   const [hoveredSetor, setHoveredSetor] = useState<string | null>(null);
   const [selectedSetor, setSelectedSetor] = useState<string | null>(null);
   const [openModalRetencao, setOpenModalRetencao] = useState(false);
   const [selectedItem, setSelectedItem] = useState<RetentionProps>();
 
-  // Calcular total corretamente - assumindo que cada item representa uma retenção
   const total = retencoes?.length || 0;
 
   const handleClick = (entry: RetentionProps) => {
@@ -20,7 +23,6 @@ export function RetentionInMonth() {
     setSelectedItem(entry);
     setOpenModalRetencao(true);
   };
-
 
   const contagemRetencoesPorSetor = retencoes?.reduce((acc, item) => {
     const setor = item.setor || "";
@@ -41,7 +43,6 @@ export function RetentionInMonth() {
 
     acc[setor].quantidade += 1;
 
-    // Assumindo que existe um campo colaborador ou nome no item
     const responsavel = item.responsavel || item.nome || "Não informado";
     if (acc[setor].colaboradores.has(responsavel)) {
       acc[setor].colaboradores.set(
@@ -66,82 +67,112 @@ export function RetentionInMonth() {
 
     return (
       <div
-        className={`p-4 rounded-lg border-2 transition-all duration-300 cursor-pointer ${isSelected
-          ? 'border-blue-500 bg-blue-50 shadow-lg'
-          : isHovered
-            ? 'border-gray-300 bg-blue-300 shadow-md border-0'
-            : 'border-gray-200 bg-white hover:border-gray-300'
+        className={`relative p-4 rounded-xl border transition-all duration-300 cursor-pointer group overflow-hidden ${isSelected
+            ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg scale-[1.02]'
+            : isHovered
+              ? 'border-blue-300 bg-gradient-to-br from-blue-25 to-blue-50 shadow-md transform scale-[1.01]'
+              : 'border-gray-200 bg-white hover:border-blue-200 hover:shadow-sm'
           }`}
         onMouseEnter={() => setHoveredSetor(item.setor)}
         onMouseLeave={() => setHoveredSetor(null)}
         onClick={() => handleClick(item)}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-100">
+        {/* Background gradient overlay */}
+        <div className={`absolute inset-0 bg-gradient-to-br from-transparent to-blue-50/30 opacity-0 transition-opacity duration-300 ${isHovered || isSelected ? 'opacity-100' : ''
+          }`} />
+
+        {/* Content */}
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${isSelected ? 'bg-blue-200 shadow-lg' : 'bg-blue-100 group-hover:bg-blue-150'
+              }`}>
               {setorIcons[item.setor] || setorIcons.default}
             </div>
             <div>
-              <p className="font-medium text-gray-900">{item.setor}</p>
-              <p className="text-sm text-gray-600">{percentage.toFixed(1)}% do total</p>
+              <p className="font-semibold text-gray-900 text-lg">{item.setor}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className={`h-2 w-16 rounded-full bg-gray-200 overflow-hidden`}>
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
+                    style={{ width: `${Math.min(percentage, 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-blue-600">{percentage.toFixed(1)}%</span>
+              </div>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-gray-900">{item.quantidade}</p>
-            <p className="text-sm text-gray-500">retenções</p>
+            <div className="flex items-center justify-end gap-1 mb-1">
+              <ArrowUp className="h-4 w-4 text-green-500" />
+              <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                {item.quantidade}
+              </p>
+            </div>
+            <p className="text-sm text-gray-500 font-medium">retenções</p>
           </div>
         </div>
+
+        {/* Hover effect border */}
+        <div className={`absolute inset-0 rounded-xl border-2 border-blue-400 opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-20' : ''
+          }`} />
       </div>
     );
   };
 
   const setorIcons: Record<string, JSX.Element> = {
-    Suporte: <Headphones className="h-5 w-5 text-blue-600" />,
-    Financeiro: <DollarSign className="h-5 w-5 text-blue-600" />,
-    Comercial: <Users className="h-5 w-5 text-blue-600" />,
-    Técnico: <Wrench className="h-5 w-5 text-blue-600" />,
-    Cancelamento: <Shield className="h-5 w-5 text-blue-600" />,
-    default: <Target className="h-5 w-5 text-blue-600" />
+    Suporte: <Headphones className="h-6 w-6 text-blue-600" />,
+    Financeiro: <DollarSign className="h-6 w-6 text-blue-600" />,
+    Comercial: <Users className="h-6 w-6 text-blue-600" />,
+    Técnico: <Wrench className="h-6 w-6 text-blue-600" />,
+    Cancelamento: <Shield className="h-6 w-6 text-blue-600" />,
+    default: <Target className="h-6 w-6 text-blue-600" />
   };
 
-  // Encontrar o setor com mais retenções para o insight
-  const setorComMaisRetencoes = contagemRetencoesPorSetor
-    ? Object.entries(contagemRetencoesPorSetor).reduce((max, [setor, dados]) =>
-      dados.quantidade > max.quantidade ? { setor, quantidade: dados.quantidade } : max,
-      { setor: "", quantidade: 0 })
-    : { setor: "", quantidade: 0 };
-
-  const percentualMaiorSetor = total > 0 ? (setorComMaisRetencoes.quantidade / total) * 100 : 0;
-
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-[calc(100vh-260px)] overflow-auto [&::-webkit-scrollbar]:w-2 
-  [&::-webkit-scrollbar-track]:bg-gray-100 
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 
   [&::-webkit-scrollbar-thumb]:bg-transparent 
-  [&::-webkit-scrollbar-thumb]:rounded-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Target className="h-6 w-6 text-blue-600" />
+  h-full">
+      {/* Header Moderno */}
+      <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 p-6 text-white">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12" />
+
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
+              <Target className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Calendar className="h-5 w-5 text-blue-200" />
+                <h2 className="text-2xl font-bold text-white">Retenções</h2>
+              </div>
+              <p className="text-blue-100 font-medium">Maio 2024</p>
+              <p className="text-blue-100 font-medium text-sm">Clique sobre o setor e veja a retenção por cada colaborador.</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-sm font-semibold text-gray-900">Retenções por Setor no mês de Maio</h2>
-            <p className="text-sm text-gray-600">Total: {total} retenções</p>
+
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
+              <Activity className="h-5 w-5 text-green-300" />
+              <span className="text-sm font-semibold text-white">Ativo</span>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-white">{total}</p>
+              <p className="text-blue-200 text-sm">Total</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
-          <TrendingUp className="h-4 w-4 text-blue-600" />
-          <span className="text-sm font-medium text-blue-600">Ativo</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1">
-        <div className="space-y-3">
-          <h3 className="text-lg font-bold text-blue-700 mb-4">Retenções por setor</h3>
 
+      <div className="p-6 overflow-auto h-full bg-gradient-to-b from-gray-50/50 to-white">
+        <div className="space-y-4">
           {contagemRetencoesPorSetor &&
             Object.entries(contagemRetencoesPorSetor)
-              .sort(([, a], [, b]) => b.quantidade - a.quantidade) // Ordenar por quantidade
+              .sort(([, a], [, b]) => b.quantidade - a.quantidade)
               .map(([setor, dados]) => {
                 const item: RetentionProps = {
                   ...dados.itemOriginal,
@@ -150,12 +181,12 @@ export function RetentionInMonth() {
                   colaboradores: Array.from(dados.colaboradores.entries()).map(([nome, quantidade]) => ({
                     nome,
                     quantidade,
-                    comissao: "" // Adiciona valor padrão para comissao
                   }))
                 };
 
                 return (
                   <StatCard
+
                     key={setor}
                     item={item}
                     isHovered={hoveredSetor === setor}
@@ -163,25 +194,9 @@ export function RetentionInMonth() {
                   />
                 );
               })}
-
-          {/* Insights */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="flex items-start gap-2">
-              <Target className="h-5 w-5 text-blue-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-blue-900">Insight Principal</p>
-                <p className="text-sm text-blue-700">
-                  O setor de <strong>{setorComMaisRetencoes.setor}</strong> representa{' '}
-                  {percentualMaiorSetor.toFixed(1)}% das retenções, indicando maior atividade
-                  neste departamento.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-
-      <ColaboradoresRetencaoModal setSelectedSetor={setSelectedSetor} setOpen={setOpenModalRetencao} selectedItem={selectedItem ?? null} open={openModalRetencao} />
+      <ColaboradoresRetencaoModal setSelectedSetor={setSelectedSetor} setOpen={setOpenModalRetencao}  selectedItem={selectedItem ?? null} open={openModalRetencao} />
     </div>
   );
 }

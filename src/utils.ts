@@ -4,7 +4,6 @@ import { z } from "zod";
 interface Colaboradores {
   nome: string;
   quantidade: number;
-  comissao: string;
 }
 
 export interface RetentionProps {

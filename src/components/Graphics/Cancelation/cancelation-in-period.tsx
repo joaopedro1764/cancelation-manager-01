@@ -394,7 +394,7 @@ export function CancelationInPeriod() {
     : 1;
 
   return (
-    <div className="w-full max-w-7xl h-[calc(100vh-260px)] overflow-y-auto [&::-webkit-scrollbar]:w-2 
+    <div className="w-full max-w-7xl h-full overflow-y-auto [&::-webkit-scrollbar]:w-2 
   [&::-webkit-scrollbar-track]:bg-gray-100 
   [&::-webkit-scrollbar-thumb]:bg-transparent 
   [&::-webkit-scrollbar-thumb]:rounded-full">

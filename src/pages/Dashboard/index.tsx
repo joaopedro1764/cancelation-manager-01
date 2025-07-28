@@ -19,11 +19,11 @@ export function Dashboard() {
       </div>
 
       {/* Linha inferior com gráficos ou seções maiores */}
-      <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:gap-4 w-full">
+      <div className="mt-5 flex flex-col gap-4 xl:flex-row xl:gap-4 overflow-hidden w-full">
         <div className="w-full xl:w-[70%]">
           <CancelationInPeriod />
         </div>
-        <div className="w-full xl:w-[30%] overflow-auto">
+        <div className="w-full xl:w-[30%]">
           <RetentionInMonth />
         </div>
       </div>
