@@ -21,7 +21,7 @@ interface ToastProps {
 }
 
 export function CancelationWeek() {
-    const [currentValue, setCurrentValue] = useState(50);
+    
     const [showToast, setShowToast] = useState(false);
     const toastRef = useRef<HTMLDivElement>(null);
     const cardRef = useRef(null);
@@ -30,6 +30,8 @@ export function CancelationWeek() {
     const generateRandomValue = () => {
         return Math.floor(Math.random() * (100 - 10 + 1)) + 10;
     };
+
+    const [currentValue, setCurrentValue] = useState(generateRandomValue());
 
     const getCardData = (value: number) => {
         if (value <= 70) {
@@ -196,7 +198,7 @@ export function CancelationWeek() {
             }
         };
         //1 em 1 hora
-        const interval = setInterval(updateValue, 10000);
+        const interval = setInterval(updateValue, 1200000);
 
         return () => clearInterval(interval);
     }, []);
@@ -249,13 +251,13 @@ export function CancelationWeek() {
                         <span className="text-sm text-gray-500">cancelamentos</span>
                     </div>
                     <p className="text-sm text-gray-600">
-                        <span className="text-green-600 font-medium">Nível baixo</span> - Padrão normal
+                        <span className={`font-medium ${cardData.level === "Alto" ? 'text-red-800' : cardData.level === "Baixo" ? 'text-green-800' : 'text-yellow-400'}`}>Nível {cardData.level}</span>
                     </p>
                 </div>
 
                 {/* Progress indicator */}
                 <div className="mt-4 w-full bg-gray-200 rounded-full h-1.5">
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-600 h-1.5 rounded-full w-1/3"></div>
+                    <div className={`bg-gradient-to-r h-1.5 ${cardData.level === "Alto" ? 'bg-red-400 text-white w-full' : cardData.level === "Baixo" ? 'bg-green-400 text-green-800 w-1/4' : 'bg-yellow-400 w-1/2'} rounded-full `}></div>
                 </div>
             </div>
             {showToast && (

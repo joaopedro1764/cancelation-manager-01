@@ -70,7 +70,6 @@ const formatarData = (rawDate: string): Date | null => {
 };
 
 
-
 const ItemGrafico = ({
   item,
   index,
@@ -130,9 +129,9 @@ export function CancelationInPeriod() {
 
   const { data: cancelamentos, isLoading } = usePlanilha({ aba: "ClientesMaio2025" })
 
-  const { resumo: cancelamentosProcessados, bairrosInviabilidade, motivosInsatisfacao, provedoreTrocados } = useMemo(() => {
+  const { resumo: cancelamentosProcessados, bairrosInviabilidade, motivosInsatisfacao, provedoreTrocados, totalCancelamentos } = useMemo(() => {
     if (!cancelamentos || !Array.isArray(cancelamentos)) {
-      return { resumo: [], bairrosInviabilidade: [], motivosInsatisfacao: [], provedoreTrocados: [] };
+      return { resumo: [], bairrosInviabilidade: [], motivosInsatisfacao: [], provedoreTrocados: [], totalCancelamento: [] };
     }
 
     const { from, to } = dateRange || {};
@@ -147,6 +146,8 @@ export function CancelationInPeriod() {
       const data = formatarData(item.dataCancelamento);
       return data && (!from || data >= from) && (!to || data <= to);
     });
+
+   const totalCancelamentos = filtrados.length
 
     filtrados.forEach((item) => {
       const data = formatarData(item.dataCancelamento);
@@ -244,12 +245,17 @@ export function CancelationInPeriod() {
       bairrosInviabilidade,
       motivosInsatisfacao,
       provedoreTrocados,
+      totalCancelamentos
     };
   }, [cancelamentos, dateRange]);
 
-  const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
 
+
+  const EstatisticasResumo = ({ dados }: { dados: CancelamentoData[] }) => {
+ 
     const principalMotivo = dados.length > 0 ? dados[0] : null;
+
+
 
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -357,7 +363,7 @@ export function CancelationInPeriod() {
             </div>
 
 
-  <div className="mb-4">
+            <div className="mb-4">
               <div className="bg-white/50 p-3 rounded-lg backdrop-blur-sm">
                 <p className="font-medium text-rose-900 text-sm leading-relaxed">
                   Lentidão e oscilação (Somente WI-FI)
@@ -421,7 +427,7 @@ export function CancelationInPeriod() {
 
           <div className="mt-4 flex items-center space-x-2">
             <Users className="h-5 w-5 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">{352}</span>
+            <span className="text-2xl font-bold text-gray-900">{totalCancelamentos}</span>
             <span className="text-gray-600">cancelamentos no período selecionado</span>
           </div>
         </div>
